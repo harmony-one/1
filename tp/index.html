@@ -45,10 +45,12 @@
         async function updateCounterDisplay(key) {
             const response = await fetch(`https://counter.sun-6f2.workers.dev/${key}`);
             const data = await response.json();
+            console.log(`${key}: ${data.count}`);
             document.getElementById(`value-${key}`).textContent = `${key}: ${data.count || 0}`;
         }
     
         async function incrementCounter(key) {
+            console.log('Incrementing:', key)
             await fetch(`https://counter.sun-6f2.workers.dev/${key}`, { method: 'POST' });
             updateCounterDisplay(key);
         }
