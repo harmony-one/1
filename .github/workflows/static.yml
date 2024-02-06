@@ -12,22 +12,17 @@ jobs:
       - name: Get changed directories
         id: set-matrix
         run: |
-          CHANGED_DIRS=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^.*\/' | awk -F/ '{print $1}' | sort -u)
-          DIRS=()
-          for DIR in $CHANGED_DIRS; do
-            if [[ "$DIR" == "al" || "$DIR" == "jn" || "$DIR" == "tf" || "$DIR" == "sa" ]]; then
-              DIRS+=("$DIR")
-            fi
-          done
-          if [ ${#DIRS[@]} -eq 0 ]; then
-            DIRS+=("none")  # Default or placeholder directory
+          CHANGED_DIRS=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -E '^(al|jn|tf|sa)/' | awk -F/ '{print $1}' | sort -u | jq -R . | jq -cs .)
+          if [ -z "$CHANGED_DIRS" ] || [ "$CHANGED_DIRS" == "[]" ]; then
+            # Provide a default value to avoid errors when no changes are found
+            CHANGED_DIRS='["none"]'
           fi
-          JSON_ARRAY=$(printf '%s\n' "${DIRS[@]}" | jq -R . | jq -s .)
-          echo "::set-output name=matrix::{\"dir\": $JSON_ARRAY}"
+          echo "::set-output name=matrix::{\"dir\": $CHANGED_DIRS}"
 
   publish:
     needs: changes
     runs-on: ubuntu-latest
+    if: ${{ fromJson(needs.changes.outputs.matrix).dir[0] != 'none' }}
     strategy:
       matrix: ${{fromJson(needs.changes.outputs.matrix)}}
       fail-fast: false
@@ -36,7 +31,6 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Publish to Cloudflare Pages
-        if: matrix.dir != 'none'
         uses: cloudflare/pages-action@v1
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -44,4 +38,3 @@ jobs:
           projectName: "${{ matrix.dir }}-1"
           directory: "${{ matrix.dir }}"
           branch: main
-
