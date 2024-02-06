@@ -50,9 +50,13 @@
         }
     
         async function incrementCounter(key) {
-            console.log('Incrementing:', key)
-            await fetch(`https://counter.sun-6f2.workers.dev/${key}`, { method: 'POST' });
-            updateCounterDisplay(key);
+            try {
+                console.log('Incrementing:', key)
+                await fetch(`https://counter.sun-6f2.workers.dev/${key}`, { method: 'POST' });
+                updateCounterDisplay(key);
+            } catch (error) {
+                console.error('Increment failed', error);
+            }
         }
     
         counters.forEach(key => {
