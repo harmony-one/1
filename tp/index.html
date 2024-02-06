@@ -41,25 +41,31 @@
             'threeThree',
             'yieldFarming'
         ];
-
+    
         async function updateCounterDisplay(key) {
             const response = await fetch(`https://counter.sun-6f2.workers.dev/${key}`);
             const data = await response.json();
             document.getElementById(`value-${key}`).textContent = `${key}: ${data.count || 0}`;
         }
-
+    
         async function incrementCounter(key) {
             await fetch(`https://counter.sun-6f2.workers.dev/${key}`, { method: 'POST' });
             updateCounterDisplay(key);
         }
-
+    
         counters.forEach(key => {
             const counterDiv = document.createElement('div');
             counterDiv.classList.add('counter');
             counterDiv.innerHTML = `
                 <p id="value-${key}">${key}: 0</p>
-                <button onclick="incrementCounter('${key}')">Increment</button>
             `;
+    
+            // Create button and add event listener
+            const button = document.createElement('button');
+            button.textContent = 'Increment';
+            button.addEventListener('click', () => incrementCounter(key));
+            counterDiv.appendChild(button);
+    
             document.getElementById('counters').appendChild(counterDiv);
             updateCounterDisplay(key);
         });
