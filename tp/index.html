@@ -1,103 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>How Degen Are You?</title>
-<!-- Tailwind CSS -->
-<!-- <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.4/dist/tailwind.min.css" rel="stylesheet">
-<style>
-  body {
-    background-color: #251E1F;
-  }
-
-  .interest-button {
-    color: #DEDDDD;
-    border: 2px solid #53B4DE;
-    background-color: #251E1F;
-    transition: background-color 0.3s, border-color 0.3s;
-    padding: 10px;
-    margin: 5px;
-    border-radius: 8px;
-    cursor: pointer;
-  }
-
-  .interest-button.selected {
-    background-color: #53B4DE;
-    color: #251E1F;
-  }
-
-  .submit-button {
-    background-color: #63FDC7;
-    color: #251E1F;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-    margin-top: 20px;
-  }
-
-  .submit-button:disabled {
-    background-color: #6B7280;
-    cursor: not-allowed;
-  }
-
-  .description {
-    color: #645F60;
-    text-align: center;
-    margin-bottom: 20px;
-  }
-</style> -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Counter Dashboard</title>
 </head>
 <body>
-  <header class="text-center my-6">
-    <h1 class="text-3xl" style="color: #DEDDDD;">How Degen Are You?</h1>
-    <p class="description">Select all crypto strategies that you have tried below.</p>
-  </header>
+    <h1>Counter Dashboard</h1>
+    <div id="counters">
+        <!-- Counter elements will be added here dynamically -->
+    </div>
 
-  <div class="grid grid-cols-2 gap-4 p-4">
-    <button class="interest-button" onclick="toggleInterest(this)">Hodl</button>
-    <button class="interest-button" onclick="toggleInterest(this)">Day Trading</button>
-    <button class="interest-button" onclick="toggleInterest(this)">Swing Trading</button>
-    <button class="interest-button" onclick="toggleInterest(this)">Staking</button>
-    <button class="interest-button" onclick="toggleInterest(this)">Yield Farming</button>
-    <button class="interest-button" onclick="toggleInterest(this)">3,3</button>
-    <button class="interest-button" onclick="toggleInterest(this)">ICO / IDO</button>
-    <button class="interest-button" onclick="toggleInterest(this)">Borrow / Lend</button>
-    <button class="interest-button" onclick="toggleInterest(this)">DCA</button>
-    <button class="interest-button" onclick="toggleInterest(this)">Airdrops</button>
-  </div>
+    <script>
+        const counters = [
+            'airdrops',
+            'borrowLend',
+            'dayTrading',
+            'dca',
+            'hodl',
+            'icoIdo',
+            'staking',
+            'swingTrading',
+            'threeThree',
+            'yieldFarming'
+        ];
 
-  <div class="text-center">
-    <button id="submit-btn" class="submit-button" onclick="finalizeSelection()" disabled>Submit</button>
-  </div>
+        async function updateCounterDisplay(key) {
+            const response = await fetch(`https://counter.sun-6f2.workers.dev/${key}`);
+            const data = await response.json();
+            document.getElementById(`value-${key}`).textContent = data.count || 0;
+        }
 
-<script>
-  let selections = [];
+        async function incrementCounter(key) {
+            await fetch(`https://counter.sun-6f2.workers.dev/${key}`, { method: 'POST' });
+            updateCounterDisplay(key);  // Refresh the display after increment
+        }
 
-  function toggleInterest(element) {
-    const option = element.textContent;
-    if (selections.includes(option)) {
-      selections = selections.filter(item => item !== option);
-      element.classList.remove('selected');
-    } else {
-      selections.push(option);
-      element.classList.add('selected');
-    }
-    document.getElementById('submit-btn').disabled = selections.length === 0;
-  }
-
-  function finalizeSelection() {
-    const buttons = document.querySelectorAll('.interest-button');
-    buttons.forEach(button => {
-      button.disabled = true;
-      button.classList.remove('selected');
-      button.onclick = null;
-    });
-    document.getElementById('submit-btn').disabled = true;
-    console.log('Final selections:', selections);
-  }
-</script>
+        counters.forEach(key => {
+            const counterDiv = document.createElement('div');
+            counterDiv.innerHTML = `
+                <h3>${key}</h3>
+                <p>Count: <span id="value-${key}">0</span></p>
+                <button onclick="incrementCounter('${key}')">Increment</button>
+            `;
+            document.getElementById('counters').appendChild(counterDiv);
+            updateCounterDisplay(key);  // Initialize display with current count
+        });
+    </script>
 </body>
 </html>
