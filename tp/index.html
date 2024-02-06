@@ -4,11 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Counter Dashboard</title>
+    <style>
+        #counters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .counter {
+            flex-basis: 20%;
+            text-align: center;
+        }
+        .counter p {
+            margin: 10px 0;
+        }
+        .counter button {
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
     <h1>Counter Dashboard</h1>
     <div id="counters">
-        <!-- Counter elements will be added here dynamically -->
+        <!-- counter elements will be added here dynamically -->
     </div>
 
     <script>
@@ -28,23 +45,23 @@
         async function updateCounterDisplay(key) {
             const response = await fetch(`https://counter.sun-6f2.workers.dev/${key}`);
             const data = await response.json();
-            document.getElementById(`value-${key}`).textContent = data.count || 0;
+            document.getElementById(`value-${key}`).textContent = `${key}: ${data.count || 0}`;
         }
 
         async function incrementCounter(key) {
             await fetch(`https://counter.sun-6f2.workers.dev/${key}`, { method: 'POST' });
-            updateCounterDisplay(key);  // Refresh the display after increment
+            updateCounterDisplay(key);
         }
 
         counters.forEach(key => {
             const counterDiv = document.createElement('div');
+            counterDiv.classList.add('counter');
             counterDiv.innerHTML = `
-                <h3>${key}</h3>
-                <p>Count: <span id="value-${key}">0</span></p>
+                <p id="value-${key}">${key}: 0</p>
                 <button onclick="incrementCounter('${key}')">Increment</button>
             `;
             document.getElementById('counters').appendChild(counterDiv);
-            updateCounterDisplay(key);  // Initialize display with current count
+            updateCounterDisplay(key);
         });
     </script>
 </body>
