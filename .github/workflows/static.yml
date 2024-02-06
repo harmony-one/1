@@ -12,12 +12,19 @@ jobs:
       - name: Get changed directories
         id: set-matrix
         run: |
-          CHANGED_DIRS=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -E '^(al|jn|tf|sa)/' | awk -F/ '{print $1}' | sort -u | jq -R . | jq -cs .)
-          if [ -z "$CHANGED_DIRS" ] || [ "$CHANGED_DIRS" == "[]" ]; then
-            # Provide a default value to avoid errors when no changes are found
-            CHANGED_DIRS='["none"]'
+          if [[ "${{ github.event.before }}" == "0000000000000000000000000000000000000000" ]]; then
+            # Fallback for the first push: consider all specified directories
+            DIRS_JSON='["al", "jn", "tf", "sa"]'
+          else
+            # Use git diff to find changed directories
+            CHANGED_DIRS=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -E '^(al|jn|tf|sa)/' | awk -F/ '{print $1}' | sort -u | jq -R . | jq -cs .)
+            if [ -z "$CHANGED_DIRS" ] || [ "$CHANGED_DIRS" == "[]" ]; then
+              DIRS_JSON='["none"]'
+            else
+              DIRS_JSON=$CHANGED_DIRS
+            fi
           fi
-          echo "::set-output name=matrix::{\"dir\": $CHANGED_DIRS}"
+          echo "::set-output name=matrix::{\"dir\": $DIRS_JSON}"
 
   publish:
     needs: changes
