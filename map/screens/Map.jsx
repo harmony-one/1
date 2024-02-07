@@ -3,19 +3,12 @@ import { Image, View, Text, StyleSheet, Dimensions, Keyboard, TouchableWithoutFe
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { connect } from 'react-redux';
  
-import { PROVIDER_GOOGLE } from 'react-native-maps';
 import { Marker } from 'react-native-maps';
-import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import * as Location from 'expo-location';
 import MapView from "react-native-map-clustering";
-
-import {GOOGLE_MAPS_API_KEY} from '@env';
  
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
-const dismissKeyboard = () => { if (Platform.OS != "web"){ Keyboard.dismiss(); } }
-
-const api_key = `${GOOGLE_MAPS_API_KEY}`
  
 function Map(props) {
  const [currentLocation, setCurrentLocation] = useState(null);
@@ -58,44 +51,22 @@ function Map(props) {
    )}
 
  return (
-     <TouchableWithoutFeedback onPress={() => dismissKeyboard()} accessible={false}>
-         <View style={{ flex: 1, width: windowWidth, height: windowHeight-180 }}>
-           <MapView
-             style={StyleSheet.absoluteFillObject}
-             provider={PROVIDER_GOOGLE}
-             ref={mapRef}
-             showsUserLocation={true}
-             followsUserLocation={true}
-             showsMyLocationButton={true}
-             showsIndoors={true}
-             showsIndoorLevelPicker={true}
-             loadingEnabled={true}
-             rotateEnabled={true}
-             scrollDuringRotateOrZoomEnabled={true}
-             initialRegion={{latitude: currentLocation[0], longitude: currentLocation[1], latitudeDelta: 0.3, longitudeDelta: 0.04}}
-             onClusterPress={(coordinate) => {
-              animate([coordinate.geometry.coordinates[1], coordinate.geometry.coordinates[0]])
-            }}
-             clustering = {true}
-             clusterColor="#00ace8"
-             radius = {50}
-             >
-             <GooglePlacesAutocomplete
-               placeholder='Search Location'
-               onPress={(data, details = null) => {
-                animate([details.geometry.location.lat, details.geometry.location.lng])
-               }}
-               fetchDetails
-               query={{
-                 key: api_key,
-                 language: 'en',
-               }}
-               renderLeftButton={()  => <MaterialCommunityIcons name="map-marker" color='grey' size={30} style={{marginLeft: 20, marginTop: 7.5, top: 15}} />}
-               styles={styles.searchBar}
-             />
-           </MapView>
-         </View>
-     </TouchableWithoutFeedback>
+  <View style={{ flex: 1, width: windowWidth, height: windowHeight-180 }}>
+  <MapView
+    style={StyleSheet.absoluteFillObject}
+    ref={mapRef}
+    showsUserLocation={true}
+    followsUserLocation={true}
+    showsMyLocationButton={true}
+    initialRegion={{
+      latitude: currentLocation[0],
+      longitude: currentLocation[1],
+      latitudeDelta: 0.3,
+      longitudeDelta: 0.04
+    }}
+  >
+  </MapView>
+</View>
  )
 }
 
