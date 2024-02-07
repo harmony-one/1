@@ -3,38 +3,13 @@ import React, { useEffect, useRef } from 'react';
 import { View, StyleSheet, Dimensions } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 
+import markers from '../assets/locations/breweries.json';
+
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
 const MapViewComponent = () => {
   const mapRef = useRef(null);
-  const markers = [
-    {
-      id: '1', // Unique identifier for the main event
-      latitude: 42.536457,
-      longitude: -70.985786,
-      title: "Peabody, MA, USA",
-      description: "This is the main event location."
-    }, {
-      id: '2',
-      latitude: 42.328674,
-      longitude: -72.664658,
-      title: "Northampton, MA, USA",
-      description: "Convention Center"
-    }, {
-      id: '3',
-      latitude: 42.341042,
-      longitude: -71.217133,
-      title: "Newton, MA, USA ",
-      description: "Convention Center"
-    }, {
-      id: '4',
-      latitude: 42.810356,
-      longitude: -70.893875,
-      title: "Newburyport, MA, USA",
-      description: "Federal "
-    }
-  ];
 
   useEffect(() => {
     if (mapRef.current) {
