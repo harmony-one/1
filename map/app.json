@@ -1,0 +1,43 @@
+{
+  "expo": {
+    "name": "ONE Map",
+    "slug": "Onemap",
+    "description": "Don't be bored.",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/app-icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.example.ProjectName",
+      "config": {
+      "googleMapsApiKey": "AIzaSyAsT7T-nZ45hNQkSkMLOydPZupLsrFzPuM"
+      }
+      },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#00ace8"
+      },
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyAsT7T-nZ45hNQkSkMLOydPZupLsrFzPuM"
+      }
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    }
+  }
+}
