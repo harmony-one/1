@@ -1,5 +1,5 @@
 [
-    {"id": 6, "name": "Somebody People", "longitude": 0, "latitude": 0, "address": "1165 S Broadway #104, Denver, CO 80210"},
+    {"id": 6, "name": "Somebody People", "longitude": 39.69589145948248, "latitude": , -104.98749833862855, "address": "1165 S Broadway #104, Denver, CO 80210"},
     {"id": 7, "name": "Vital Root", "longitude": 0, "latitude": 0, "address": "3915 Tennyson St, Denver, CO 80212"},
     {"id": 8, "name": "Gladys Restaurant", "longitude": 0, "latitude": 0, "address": "5505 W 20th Ave Suite 116, Edgewater, CO 80214"},
     {"id": 9, "name": "Sputnik", "longitude": 0, "latitude": 0, "address": "3 S Broadway, Denver, CO 80209"},
