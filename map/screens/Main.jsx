@@ -5,7 +5,6 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import MapScreen from './Map'
 import EventsScreen from './Events'
 import CommunityScreen from './Community'
-import AccountScreen from './Account'
 
 import firebase from 'firebase/app'
 import { connect } from 'react-redux'
@@ -48,18 +47,6 @@ export class Main extends Component {
                 options={{
                     tabBarIcon: ({ color, size }) => (
                         <MaterialCommunityIcons name="calendar-month" color={color} size={26} />
-                    ),
-                }} />
-            <Tab.Screen name="Account" component={AccountScreen} 
-                listeners={({ navigation }) => ({
-                    tabPress: event => {
-                        event.preventDefault();
-                        navigation.navigate("Account", {uid: firebase.auth().currentUser.uid})
-                    }
-                })}
-                options={{
-                    tabBarIcon: ({ color, size }) => (
-                        <MaterialCommunityIcons name="account" color={color} size={26} />
                     ),
                 }} />
         </Tab.Navigator>
