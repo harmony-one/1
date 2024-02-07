@@ -3,7 +3,7 @@ import React, { useEffect, useRef } from 'react';
 import { View, StyleSheet, Dimensions } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 
-import markers from '../assets/locations/breweries.json';
+import markers from '../assets/locations/tf.json';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
