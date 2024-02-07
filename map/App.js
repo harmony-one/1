@@ -20,6 +20,9 @@ const store = createStore(rootReducer, applyMiddleware(thunk))
 
 import { LogBox } from 'react-native';
 import {FIREBASE_API_KEY} from '@env';
+import MapViewComponent from './screens/MapViewComponent'
+import { StyleSheet } from 'react-native';
+
 
 LogBox.ignoreLogs(['Warning: ...']);
 LogBox.ignoreAllLogs();
@@ -39,69 +42,19 @@ if(firebase.apps.length === 0){
 
 const Stack = createStackNavigator();
 
-export class App extends Component {
-  constructor(props){
-    super(props);
-    this.state = {
-      loaded: false,
-    }
-  }
-
-  componentDidMount(){
-    firebase.auth().onAuthStateChanged((user)=> {
-      if(!user){
-        this.setState({
-          loggedIn: false,
-          loaded: true,
-        })
-      } else {
-        this.setState({
-          loggedIn: true,
-          loaded: true,
-        })
-      }
-    })
-  }
-
-  render() {
-    const { loggedIn, loaded } = this.state;
-    if(!loaded){
-      return(
-        <View style={{ flex: 1, justifyContent: "center" }}>
-          <Text>Loading</Text>
-        </View>
-      )
-    }
-
-    if(!loggedIn){
-      return (
-        <NavigationContainer>
-          <Stack.Navigator initialRouteName="Landing">
-            <Stack.Screen name="Landing" component={LandingScreen} options={{ headerShown: false }} />
-            <Stack.Screen name="Register" component={RegisterScreen} options={{ headerShown: false }} />
-            <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
-          </Stack.Navigator>
-        </NavigationContainer>
-      );
-    }
-    return (
-      <Provider store={store}>
-        <NavigationContainer>
-          <Stack.Navigator initialRouteName="Main">
-            <Stack.Screen name="Main" component={MainScreen} 
-              options={{
-                title: 'ONE Map',
-                headerStyle: {
-                  backgroundColor: '#00ace8',
-                },
-                headerTintColor: '#47515F',
-              }}
-            />
-          </Stack.Navigator>
-        </NavigationContainer>
-      </Provider>
-    )
-  }
+function MyStack() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen name="MapView" component={MapViewComponent} options={{ title: 'Harmony' }} />
+      {/* You can add more screens to the stack here */}
+    </Stack.Navigator>
+  );
 }
 
-export default App
+export default function App() {
+  return (
+    <NavigationContainer>
+      <MyStack />
+    </NavigationContainer>
+  );
+}
