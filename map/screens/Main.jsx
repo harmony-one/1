@@ -10,7 +10,7 @@ import AccountScreen from './Account'
 import firebase from 'firebase/app'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import { fetchUser, fetchUserEvents, fetchUserPhotos, fetchUserFollowing, clearData } from '../components/redux/actions/index'
+import { fetchUser, clearData } from '../components/redux/actions/index'
 
 const Tab = createMaterialBottomTabNavigator();
 
@@ -22,9 +22,6 @@ export class Main extends Component {
   componentDidMount(){
     this.props.clearData();
     this.props.fetchUser();
-    this.props.fetchUserEvents();
-    this.props.fetchUserPhotos();
-    this.props.fetchUserFollowing();
   }
   render() {
     return (
@@ -73,6 +70,6 @@ export class Main extends Component {
 const mapStateToProps = (store) => ({
     currentUser: store.userState.currentUser
 })
-const mapDispatchProps = (dispatch) => bindActionCreators({fetchUser, fetchUserEvents, fetchUserPhotos, fetchUserFollowing, clearData}, dispatch);
+const mapDispatchProps = (dispatch) => bindActionCreators({fetchUser, clearData}, dispatch);
 
 export default connect(mapStateToProps, mapDispatchProps)(Main);

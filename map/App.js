@@ -19,17 +19,18 @@ import thunk from 'redux-thunk'
 const store = createStore(rootReducer, applyMiddleware(thunk))
 
 import { LogBox } from 'react-native';
+import {FIREBASE_API_KEY} from '@env';
 
 LogBox.ignoreLogs(['Warning: ...']);
 LogBox.ignoreAllLogs();
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDTkmkIpDCyns_oMzO8NtFF1kOslpOAKMg",
-  authDomain: "harmony-413522.firebaseapp.com",
-  projectId: "harmony-413522",
-  storageBucket: "harmony-413522.appspot.com",
-  messagingSenderId: "291277614222",
-  appId: "1:291277614222:web:37c883a666ef8d90b32ddf"
+  apiKey: `${FIREBASE_API_KEY}`,
+  authDomain: "harmony-64ffb.firebaseapp.com",
+  projectId: "harmony-64ffb",
+  storageBucket: "harmony-64ffb.appspot.com",
+  messagingSenderId: "787358226489",
+  appId: "1:787358226489:web:de977476792ce8018615e8"
 };
 
 if(firebase.apps.length === 0){

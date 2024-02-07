@@ -113,8 +113,6 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = (store) => ({
   currentUser: store.userState.currentUser,
-  events: store.userState.events,
-  photos: store.userState.photos,
 })
 
 export default connect(mapStateToProps, null)(Account);

@@ -51,10 +51,10 @@ export class Register extends Component {
                     >
         <TouchableWithoutFeedback onPress={() => dismissKeyboard()} accessible={false}>
           <SafeAreaView style={styles.appContainer}>
-            <Image
+            {/* <Image
                 style={styles.headerImage}
                 source={require('../assets/RegisterHeader.png')}
-            />
+            /> */}
             <View style={styles.inputContainer}>
               <TextInput 
                 placeholder="Name"
@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
   },
   button: {
     alignItems: "center",
-    backgroundColor: "#8abbc2",
+    backgroundColor: "#00ace8",
     padding: 10,
     borderRadius: 30,
     width: 250,

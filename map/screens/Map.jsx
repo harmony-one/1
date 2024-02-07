@@ -9,13 +9,13 @@ import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplet
 import * as Location from 'expo-location';
 import MapView from "react-native-map-clustering";
 
-import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
+import {GOOGLE_MAPS_API_KEY} from '@env';
  
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 const dismissKeyboard = () => { if (Platform.OS != "web"){ Keyboard.dismiss(); } }
 
-const api_key = ''
+const api_key = `${GOOGLE_MAPS_API_KEY}`
  
 function Map(props) {
  const [currentLocation, setCurrentLocation] = useState(null);
