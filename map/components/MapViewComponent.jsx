@@ -36,8 +36,8 @@ const MapViewComponent = () => {
             key={index}
             identifier={marker.id} // Use identifier for fitToSuppliedMarkers
             coordinate={{ latitude: marker.latitude, longitude: marker.longitude }}
-            title={marker.title}
-            description={marker.description}
+            title={marker.name}
+            description={marker.address}
           />
         ))}
       </MapView>
