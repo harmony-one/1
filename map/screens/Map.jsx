@@ -11,61 +11,20 @@ const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
  
 function Map(props) {
- const [currentLocation, setCurrentLocation] = useState(null);
- const [errorMsg, setErrorMsg] = useState(null);
- 
- useEffect(() => {
-   (async () => {
-    
-     let { status } = await Location.requestForegroundPermissionsAsync();
-     if (status !== 'granted') {
-       setErrorMsg('Permission to access location was denied');
-       return;
-     }
- 
-     let location = await Location.getCurrentPositionAsync({});
-     setCurrentLocation([location.coords.latitude, location.coords.longitude]);
-
-   })();
- }, []);
-
- let text = 'Fetching Location...';
- if (errorMsg) {
-   text = errorMsg;
- }
-
-  const mapRef = useRef(null);
-  const animate = (coordinate) => {
-    let newRegion = {latitude: coordinate[0], longitude: coordinate[1], latitudeDelta: 0.1, longitudeDelta: 0.04};
-    mapRef.current.animateToRegion(newRegion, 800);
-  }
-
- if (currentLocation === null) {
-   return (
-     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-       <View>
-           <ActivityIndicator size="large" color="#00ace8" />
-       </View>
-       <Text style={{ fontSize: 15, marginTop: 10, color: "#00ace8"}}>{text}</Text>
-     </View>
-   )}
-
+  const [mapRegion, setmapRegion] = useState({
+    latitude: 41.223,
+    longitude: 23.232,
+    latitudeDelta: 0.0922,
+    longitudeDelta: 0.0421,
+  });
  return (
   <View style={{ flex: 1, width: windowWidth, height: windowHeight-180 }}>
-  <MapView
-    style={StyleSheet.absoluteFillObject}
-    ref={mapRef}
-    showsUserLocation={true}
-    followsUserLocation={true}
-    showsMyLocationButton={true}
-    initialRegion={{
-      latitude: currentLocation[0],
-      longitude: currentLocation[1],
-      latitudeDelta: 0.3,
-      longitudeDelta: 0.04
-    }}
-  >
-  </MapView>
+        <MapView
+        style={{ alignSelf: 'stretch', height: '100%' }}
+        region={mapRegion}
+      >
+        <Marker coordinate={mapRegion} title='Marker' />
+      </MapView>
 </View>
  )
 }
