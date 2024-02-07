@@ -10,7 +10,11 @@ const Stack = createStackNavigator();
 function MyStack() {
   return (
     <Stack.Navigator>
-      <Stack.Screen name="MapView" component={MapViewComponent} options={{ title: 'Harmony' }} />
+      <Stack.Screen
+        name="MapView"
+        component={MapViewComponent}
+        options={{ headerShown: false }}
+      />
       {/* You can add more screens to the stack here */}
     </Stack.Navigator>
   );
