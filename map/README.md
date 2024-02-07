@@ -1,5 +1,7 @@
 # ONEMap
 
+* **Configuration**:
+Add API keys to app/json and dotenv file.
 
 * **Colors**:
     * Primary: #00ace8
