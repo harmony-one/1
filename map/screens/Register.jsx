@@ -51,10 +51,6 @@ export class Register extends Component {
                     >
         <TouchableWithoutFeedback onPress={() => dismissKeyboard()} accessible={false}>
           <SafeAreaView style={styles.appContainer}>
-            {/* <Image
-                style={styles.headerImage}
-                source={require('../assets/RegisterHeader.png')}
-            /> */}
             <View style={styles.inputContainer}>
               <TextInput 
                 placeholder="Name"

@@ -42,10 +42,6 @@ export class Login extends Component {
                     >
         <TouchableWithoutFeedback onPress={() => dismissKeyboard()} accessible={false}>
           <SafeAreaView style={styles.appContainer}>
-              {/* <Image
-                    style={styles.headerImage}
-                    source={require('../assets/LoginHeader.png')}
-                /> */}
                 <View style={styles.inputContainer}>
                     <TextInput 
                       placeholder="Email"
