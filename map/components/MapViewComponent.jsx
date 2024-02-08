@@ -1,15 +1,23 @@
 // MapViewComponent.jsx
-import React, { useEffect, useRef } from 'react';
-import { View, StyleSheet, Dimensions, Text, Button } from 'react-native';
-import MapView, { Marker, Callout } from 'react-native-maps';
-
-import markers from '../assets/locations/tf.json';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, StyleSheet, Dimensions } from 'react-native';
+import MapView, { Marker } from 'react-native-maps';
+import { getMapMarkers } from '../api/markers';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
 const MapViewComponent = () => {
+  const [markers, setMarkers] = useState([])
   const mapRef = useRef(null);
+
+  useEffect(() => {
+    const getMarkers = async () => {
+      const markers = await getMapMarkers('af')
+      setMarkers(markers)
+    }
+    getMarkers()
+  }, [])
 
   useEffect(() => {
     if (mapRef.current) {
@@ -18,7 +26,7 @@ const MapViewComponent = () => {
         animated: true,
       });
     }
-  }, []);
+  }, [markers]);
 
   const handlePress = (marker) => {
     console.log('Button pressed for:', marker.name);
@@ -35,7 +43,7 @@ const MapViewComponent = () => {
           latitudeDelta: 40,
           longitudeDelta: 40,
         }}>
-        {markers.map((marker, index) => (
+        {markers.length > 0 && markers.map((marker, index) => (
           <Marker
             key={index}
             identifier={marker.id} // Use identifier for fitToSuppliedMarkers

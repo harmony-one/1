@@ -3,6 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import MapViewComponent from './components/MapViewComponent';
+import RecordViewComponent from './components/RecordViewComponent';
 
 
 const Stack = createStackNavigator();
@@ -13,6 +14,11 @@ function MyStack() {
       <Stack.Screen
         name="MapView"
         component={MapViewComponent}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="RecordView"
+        component={RecordViewComponent}
         options={{ headerShown: false }}
       />
       {/* You can add more screens to the stack here */}
