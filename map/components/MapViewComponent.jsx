@@ -13,7 +13,7 @@ const MapViewComponent = () => {
 
   useEffect(() => {
     const getMarkers = async () => {
-      const markers = await getMapMarkers()
+      const markers = await getMapMarkers('af')
       setMarkers(markers)
     }
     getMarkers()
