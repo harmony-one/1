@@ -15,7 +15,7 @@
   "submit": {
     "production": {
       "ios": {
-        "appleId": "",
+        "appleId": "rika@harmony.one",
         "ascAppId": "",
         "appleTeamId": ""
       }

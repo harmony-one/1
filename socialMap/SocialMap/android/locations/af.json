@@ -1,0 +1,7 @@
+[
+    {"id": 6, "name": "Somebody People", "longitude":  -104.98749833862855, "latitude": 39.69589145948248, "address": "1165 S Broadway #104, Denver, CO 80210"},
+    {"id": 7, "name": "Vital Root", "longitude":  -105.04418342723464, "latitude": 39.77156655701008, "address": "3915 Tennyson St, Denver, CO 80212"},
+    {"id": 8, "name": "Gladys Restaurant", "longitude": -105.05657839230616, "latitude": 39.75016436545131, "address": "5505 W 20th Ave Suite 116, Edgewater, CO 80214"},
+    {"id": 9, "name": "Sputnik", "longitude": -104.98774237326617, "latitude": 39.716584132908615, "address": "3 S Broadway, Denver, CO 80209"},
+    {"id": 10, "name": "Vegan Van at The Assembly", "longitude": -104.99266490395166, "latitude": 39.77140894979433, "address": ""}
+  ]
