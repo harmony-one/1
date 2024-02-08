@@ -51,7 +51,10 @@ const MapViewComponent = () => {
               <View style={styles.calloutView}>
                 <Text style={styles.calloutTitle}>{marker.name}</Text>
                 <Text>{marker.address}</Text>
-                <Button title="Check-in" onPress={() => handlePress(marker)} />
+                <View style={styles.buttonContainer}>
+                  <Button title="Check-in" onPress={() => handlePress(marker)} />
+                  <Button title="Voice Memo" onPress={() => handlePress(marker)} />
+                </View>
               </View>
             </Callout>
           </Marker>
@@ -73,7 +76,7 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
     borderRadius: 15,
-    backgroundColor: 'blue',
+    backgroundColor: '#00ace8',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -89,6 +92,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
     marginBottom: 5,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
 });
 
