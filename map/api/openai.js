@@ -1,22 +1,22 @@
 import * as FileSystem from 'expo-file-system'
-import OpenAI from 'openai'
-
-const openai = new OpenAI({ apiKey: 'OPENAI' })
+import axios from 'axios' 
 
 export async function speechToText (filePath) {
-
-  // need to make the openai call on the backend. Working on that
-
-  console.log(filePath)
-  const stream = await FileSystem.readAsStringAsync(filePath, {
-    encoding: FileSystem.EncodingType.Base64,
-  });
-
-  const result = await openai.audio.transcriptions.create({
-    file: stream,
-    model: 'whisper-1'
-  })
-  return result.text
+  const blobfile = await (await fetch(filePath)).blob()
+  const formData = new FormData()
+  const filename = filePath.split('recordings/')[1]
+  const file = new File([blobfile], filename, { lastModified: Date.now(), type: 'audio/wav' })
+  formData.append('data', file)
+  let config = {
+    method: "post",
+    maxBodyLength: Infinity,
+    url: "http://localhost:8080/openai/upload-audio",
+    headers: {
+      "Content-Type": "audio/wav"
+    },
+    data: formData,
+  };
+  const response = await axios.request(config)
+  console.log(response.data)
+  return response.data
 }
-
-
