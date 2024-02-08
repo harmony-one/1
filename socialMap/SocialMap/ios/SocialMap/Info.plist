@@ -51,6 +51,7 @@
 <string>We need access to your location to show it on the map</string>
 <key>NSLocationAlwaysUsageDescription</key>
 <string>We need access to your location to show it on the map</string>
-
+<key>NSMicrophoneUsageDescription</key>
+<string>We need access to your microphone for recording audio.</string>
 </dict>
 </plist>
