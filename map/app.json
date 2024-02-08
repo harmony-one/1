@@ -2,7 +2,7 @@
   "expo": {
     "name": "onemap",
     "slug": "onemap",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -31,6 +31,12 @@
       "eas": {
         "projectId": "c465cfd7-db30-461b-b6c3-ae956bd557d5"
       }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/c465cfd7-db30-461b-b6c3-ae956bd557d5"
     }
   }
 }
