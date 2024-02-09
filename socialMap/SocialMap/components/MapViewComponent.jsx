@@ -3,7 +3,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, Button, StyleSheet, Dimensions, Platform, TouchableOpacity, Alert, CheckmarkBox } from 'react-native';
 import MapView, { Marker, Callout } from 'react-native-maps';
 import { AudioRecorder, AudioUtils } from 'react-native-audio';
-import Sound from 'react-native-sound';
 import { getMapMarkers } from '../apis/markers';
 import { speechToText } from '../apis/openai';
 import Toast from 'react-native-toast-message';
@@ -19,11 +18,12 @@ const MapViewComponent = () => {
   const [markers, setMarkers] = useState([])
   const [isRecording, setIsRecording] = useState(false);
   const [hasPermission, setHasPermission] = useState(false);
-  const audioPath = AudioUtils.DocumentDirectoryPath + '/voiceMemo.mp4';
   const mapRef = useRef(null);
   const [checkedIn, setCheckedIn] = useState({});
   const [items, setItems] = useState([]);
-
+  const [recordings, setRecordings] = useState([]);
+  const [audioPath, setAudioPath] = useState(AudioUtils.DocumentDirectoryPath + `/voiceMemo_${Date.now()}.mp4`);
+  
   // Function to add data to the array
   const addItem = (id, text) => {
     const newItem = { id, text };
@@ -68,6 +68,16 @@ const MapViewComponent = () => {
       return;
     }
     setIsRecording(true);
+    if (recordings.length > 0) {
+      const audio = AudioUtils.DocumentDirectoryPath + `/voiceMemo_${Date.now()}.mp4`
+      setAudioPath(audio)
+      AudioRecorder.prepareRecordingAtPath(audio, {
+        SampleRate: 22050,
+        Channels: 1,
+        AudioQuality: 'High',
+        AudioEncoding: 'aac',
+      });
+    }
     await AudioRecorder.startRecording();
   };
 
@@ -80,28 +90,25 @@ const MapViewComponent = () => {
     try {
       console.log(audioPath)
       const result = await speechToText(audioPath);
-      console.log('Transcription result:', result);
-      Toast.show({
-        type: 'success',
-        text1: result,
-      });
-      addItem(id, result);
-      console.log('Current data store in array', items);
-      // Process the transcription result as needed
+      if (result) {
+        console.log('Transcription result:', result);
+        Toast.show({
+          type: 'success',
+          text1: result,
+        });
+        addItem(id, result);
+        setRecordings(prevRecordings => [...prevRecordings, audioPath]);
+        // setAudioPath(AudioUtils.DocumentDirectoryPath + `/voiceMemo_${Date.now()}.mp4`)
+        console.log('Current data store in array', items);
+      } else {
+        Toast.show({
+          type: 'error',
+          text1: 'The voice memo could not be processed',
+        });
+      }
     } catch (error) {
       console.error('Error processing audio:', error);
     }
-
-    // const sound = new Sound(audioPath, '', (error) => {
-    //   if (error) {
-    //     console.log('Failed to load the sound', error);
-    //     return;
-    //   }
-    //   console.log('Current audio path', audioPath);
-    //   sound.play(() => {
-    //     sound.release();
-    //   });
-    // });
   };
 
   const handlePress = (marker) => {
