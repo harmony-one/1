@@ -53,5 +53,13 @@
 <string>We need access to your location to show it on the map</string>
 <key>NSMicrophoneUsageDescription</key>
 <string>We need access to your microphone for recording audio.</string>
+<key>NSMicrophoneUsageDescription</key>
+<string>We need access to your microphone for recording purposes.</string>
+<key>UIAppFonts</key>
+<array>
+  <string>MaterialIcons.ttf</string>
+  <!-- Add other fonts as needed -->
+</array>
+
 </dict>
 </plist>
