@@ -19,11 +19,12 @@ const MapViewComponent = () => {
   const [markers, setMarkers] = useState([])
   const [isRecording, setIsRecording] = useState(false);
   const [hasPermission, setHasPermission] = useState(false);
-  const audioPath = AudioUtils.DocumentDirectoryPath + '/voiceMemo.mp4';
   const mapRef = useRef(null);
   const [checkedIn, setCheckedIn] = useState({});
   const [items, setItems] = useState([]);
-
+  const [recordings, setRecordings] = useState([]);
+  const [audioPath, setAudioPath] = useState(AudioUtils.DocumentDirectoryPath + `/voiceMemo_0.mp4`);
+  
   // Function to add data to the array
   const addItem = (id, text) => {
     const newItem = { id, text };
@@ -68,6 +69,14 @@ const MapViewComponent = () => {
       return;
     }
     setIsRecording(true);
+    if (recordings.length > 0) {
+      AudioRecorder.prepareRecordingAtPath(audioPath, {
+        SampleRate: 22050,
+        Channels: 1,
+        AudioQuality: 'High',
+        AudioEncoding: 'aac',
+      });
+    }
     await AudioRecorder.startRecording();
   };
 
@@ -86,22 +95,13 @@ const MapViewComponent = () => {
         text1: result,
       });
       addItem(id, result);
+      setRecordings(prevRecordings => [...prevRecordings, audioPath]);
+      setAudioPath(AudioUtils.DocumentDirectoryPath + `/voiceMemo_${recordings.length + 1}.mp4`)
       console.log('Current data store in array', items);
       // Process the transcription result as needed
     } catch (error) {
       console.error('Error processing audio:', error);
     }
-
-    // const sound = new Sound(audioPath, '', (error) => {
-    //   if (error) {
-    //     console.log('Failed to load the sound', error);
-    //     return;
-    //   }
-    //   console.log('Current audio path', audioPath);
-    //   sound.play(() => {
-    //     sound.release();
-    //   });
-    // });
   };
 
   const handlePress = (marker) => {
