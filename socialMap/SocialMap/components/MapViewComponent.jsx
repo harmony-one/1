@@ -190,7 +190,7 @@ const MapViewComponent = () => {
                       isChecked={!!checkedIn[marker]}
                       onPress={() => toggleCheckIn(marker)}
                     />
-                    <Button title="Check-In" onPress={() => handleCheckIn(marker)} />
+                    <Button title="Check-In" />
                   </View>
 
                   <Button
