@@ -43,7 +43,7 @@ const MapViewComponent = () => {
           latitudeDelta: 40,
           longitudeDelta: 40,
         }}>
-        {markers.length > 0 && markers.map((marker, index) => (
+        {markers && markers.length > 0 && markers.map((marker, index) => (
           <Marker
             key={index}
             identifier={marker.id} // Use identifier for fitToSuppliedMarkers

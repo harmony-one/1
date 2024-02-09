@@ -2,15 +2,17 @@ import * as FileSystem from 'expo-file-system'
 import axios from 'axios' 
 
 export async function speechToText (filePath) {
-  const blobfile = await (await fetch(filePath)).blob()
-  const formData = new FormData()
   const filename = filePath.split('recordings/')[1]
-  const file = new File([blobfile], filename, { lastModified: Date.now(), type: 'audio/wav' })
-  formData.append('data', file)
+  const formData = new FormData();
+    formData.append('data', {
+      uri: filePath,
+      name: filename,
+      type: 'audio/wav',
+    });
   let config = {
     method: "post",
     maxBodyLength: Infinity,
-    url: "http://localhost:8080/openai/upload-audio",
+    url: "https://harmony-llm-api.fly.dev/openai/upload-audio",
     headers: {
       "Content-Type": "audio/wav"
     },

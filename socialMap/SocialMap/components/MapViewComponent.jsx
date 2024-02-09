@@ -10,17 +10,16 @@ const windowHeight = Dimensions.get('window').height;
 
 const MapViewComponent = () => {
   // State for managing recording
+  const [markers, setMarkers] = useState([])
   const [isRecording, setIsRecording] = useState(false);
   const [hasPermission, setHasPermission] = useState(false);
   const audioPath = AudioUtils.DocumentDirectoryPath + '/voiceMemo.aac';
   const mapRef = useRef(null);
 
   useEffect(() => {
-    if (mapRef.current) {
-      mapRef.current.fitToSuppliedMarkers(markers.map(marker => marker.id), {
-        edgePadding: { top: 50, right: 50, bottom: 50, left: 50 },
-        animated: true,
-      });
+    const getMarkers = async () => {
+      const markers = await getMapMarkers('af')
+      setMarkers(markers)
     }
     AudioRecorder.requestAuthorization().then((isAuthorised) => {
       setHasPermission(isAuthorised);
@@ -33,7 +32,17 @@ const MapViewComponent = () => {
         });
       }
     });
-  }, []);
+    getMarkers()
+  }, [])
+
+  useEffect(() => {
+    if (mapRef.current) {
+      mapRef.current.fitToSuppliedMarkers(markers.map(marker => marker.id), {
+        edgePadding: { top: 50, right: 50, bottom: 50, left: 50 },
+        animated: true,
+      });
+    }
+  }, [markers]);
 
   // Handle recording start
   const startRecording = async () => {
@@ -78,7 +87,7 @@ const MapViewComponent = () => {
           latitudeDelta: 40,
           longitudeDelta: 40,
         }}>
-        {markers.map((marker, index) => (
+        {markers && markers.map((marker, index) => (
           <Marker
             key={index}
             identifier={marker.id} // Use identifier for fitToSuppliedMarkers
