@@ -3,7 +3,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, Button, StyleSheet, Dimensions, Platform, TouchableOpacity, Alert, CheckmarkBox } from 'react-native';
 import MapView, { Marker, Callout } from 'react-native-maps';
 import { AudioRecorder, AudioUtils } from 'react-native-audio';
-import Sound from 'react-native-sound';
 import { getMapMarkers } from '../apis/markers';
 import { speechToText } from '../apis/openai';
 import Toast from 'react-native-toast-message';
@@ -23,7 +22,7 @@ const MapViewComponent = () => {
   const [checkedIn, setCheckedIn] = useState({});
   const [items, setItems] = useState([]);
   const [recordings, setRecordings] = useState([]);
-  const [audioPath, setAudioPath] = useState(AudioUtils.DocumentDirectoryPath + `/voiceMemo_0.mp4`);
+  const [audioPath, setAudioPath] = useState(AudioUtils.DocumentDirectoryPath + `/voiceMemo_${Date.now()}.mp4`);
   
   // Function to add data to the array
   const addItem = (id, text) => {
@@ -70,7 +69,9 @@ const MapViewComponent = () => {
     }
     setIsRecording(true);
     if (recordings.length > 0) {
-      AudioRecorder.prepareRecordingAtPath(audioPath, {
+      const audio = AudioUtils.DocumentDirectoryPath + `/voiceMemo_${Date.now()}.mp4`
+      setAudioPath(audio)
+      AudioRecorder.prepareRecordingAtPath(audio, {
         SampleRate: 22050,
         Channels: 1,
         AudioQuality: 'High',
@@ -89,16 +90,22 @@ const MapViewComponent = () => {
     try {
       console.log(audioPath)
       const result = await speechToText(audioPath);
-      console.log('Transcription result:', result);
-      Toast.show({
-        type: 'success',
-        text1: result,
-      });
-      addItem(id, result);
-      setRecordings(prevRecordings => [...prevRecordings, audioPath]);
-      setAudioPath(AudioUtils.DocumentDirectoryPath + `/voiceMemo_${recordings.length + 1}.mp4`)
-      console.log('Current data store in array', items);
-      // Process the transcription result as needed
+      if (result) {
+        console.log('Transcription result:', result);
+        Toast.show({
+          type: 'success',
+          text1: result,
+        });
+        addItem(id, result);
+        setRecordings(prevRecordings => [...prevRecordings, audioPath]);
+        // setAudioPath(AudioUtils.DocumentDirectoryPath + `/voiceMemo_${Date.now()}.mp4`)
+        console.log('Current data store in array', items);
+      } else {
+        Toast.show({
+          type: 'error',
+          text1: 'The voice memo could not be processed',
+        });
+      }
     } catch (error) {
       console.error('Error processing audio:', error);
     }
