@@ -35,6 +35,7 @@ const MapViewComponent = () => {
         animated: true,
         showsMyLocationButton: true,
       });
+      console.log('mapRef.current result:');
     }
     AudioRecorder.requestAuthorization().then((isAuthorised) => {
       setHasPermission(isAuthorised);
@@ -125,21 +126,30 @@ const MapViewComponent = () => {
       [id]: !prev[id],
     }));
   };
-
+  
   const getCurrentLocation = () => {
+    console.log('Attempting to get current position...');
     Geolocation.getCurrentPosition(
       (position) => {
+        console.log('Current position:', position);
         const { latitude, longitude } = position.coords;
         const newRegion = {
           latitude,
           longitude,
+          latitudeDelta: 0.01, // Optionally adjust the latitudeDelta and longitudeDelta
+          longitudeDelta: 0.01,
         };
-        mapRef.current.animateToRegion(newRegion); // Ensure mapRef is defined and points to your MapView
+        mapRef.current.animateToRegion(newRegion);
       },
-      (error) => Alert.alert('Error', error.message),
-      { enableHighAccuracy: true},
+      (error) => {
+        console.error('Error getting current position:', error);
+        Alert.alert('Error', error.message);
+      },
+      { enableHighAccuracy: true }
     );
   };
+  
+
   const CheckmarkBox = ({ isChecked, onPress }) => (
     <TouchableOpacity onPress={onPress} style={styles.checkboxContainer}>
       {isChecked && <Text style={styles.checkboxCheck}>✓</Text>}
