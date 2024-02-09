@@ -947,6 +947,7 @@ PODS:
   - react-native-config (1.5.1):
     - react-native-config/App (= 1.5.1)
   - react-native-config/App (1.5.1):
+    - React-Core
   - react-native-geolocation (3.1.0):
     - React-Core
   - react-native-maps (1.10.1):

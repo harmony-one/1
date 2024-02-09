@@ -6,8 +6,7 @@ import { AudioRecorder, AudioUtils } from 'react-native-audio';
 import Sound from 'react-native-sound';
 import { getMapMarkers } from '../apis/markers';
 import { speechToText } from '../apis/openai';
-import markers from '../assets/locations/tf.json';
-import axios from 'axios';
+import Toast from 'react-native-toast-message';
 import Geolocation from '@react-native-community/geolocation';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
@@ -30,7 +29,6 @@ const MapViewComponent = () => {
     const newItem = { id, text };
     setItems(currentItems => [...currentItems, newItem]);
   };
-
 
   useEffect(() => {
     const getMarkers = async () => {
@@ -73,34 +71,6 @@ const MapViewComponent = () => {
     await AudioRecorder.startRecording();
   };
 
-  // Function to convert speech to text using OpenAI's Whisper model
-  async function convertSpeechToText(audioUri) {
-    // Prepare the form data
-    const formData = new FormData();
-    formData.append('file', {
-      uri: audioUri,
-      type: 'audio/mp4', // Adjust based on your audio file's format, e.g., 'audio/wav' for WAV files
-      name: 'openai.mp3', // The file name doesn't impact the API request but is required for FormData
-    });
-    formData.append('model', 'whisper-1'); // Specify the model if required by the API, adjust based on availability and requirements
-
-    // Configure the request headers
-    const headers = {
-      'Authorization': 'Bearer Token', // Replace with your actual OpenAI API key
-      'Content-Type': 'multipart/form-data',
-    };
-
-    try {
-      // Make the POST request to OpenAI's Speech API
-      const response = await axios.post('https://api.openai.com/v1/audio/transcriptions', formData, { headers });
-      console.log('Response from OpenAI:', response.data);
-      return response.data; // Adjust based on the API's response structure
-    } catch (error) {
-      console.error('Error converting speech to text:', error.response || error);
-      throw error;
-    }
-  }
-
   // Handle recording stop and playback
   const stopRecordingAndPlayBack = async (id) => {
     if (!isRecording) return;
@@ -108,25 +78,30 @@ const MapViewComponent = () => {
     setIsRecording(false);
     // Playback the recording
     try {
-      const result = await convertSpeechToText(audioPath);
+      console.log(audioPath)
+      const result = await speechToText(audioPath);
       console.log('Transcription result:', result);
-      addItem(id, result.text);
+      Toast.show({
+        type: 'success',
+        text1: result,
+      });
+      addItem(id, result);
       console.log('Current data store in array', items);
       // Process the transcription result as needed
     } catch (error) {
       console.error('Error processing audio:', error);
     }
 
-    const sound = new Sound(audioPath, '', (error) => {
-      if (error) {
-        console.log('Failed to load the sound', error);
-        return;
-      }
-      console.log('Current audio path', audioPath);
-      sound.play(() => {
-        sound.release();
-      });
-    });
+    // const sound = new Sound(audioPath, '', (error) => {
+    //   if (error) {
+    //     console.log('Failed to load the sound', error);
+    //     return;
+    //   }
+    //   console.log('Current audio path', audioPath);
+    //   sound.play(() => {
+    //     sound.release();
+    //   });
+    // });
   };
 
   const handlePress = (marker) => {
@@ -140,6 +115,10 @@ const MapViewComponent = () => {
     }));
   };
   
+  const handleCheckIn = (marker) => {
+    console.log('marker checked in', marker)
+  }
+
   const getCurrentLocation = () => {
     console.log('Attempting to get current position...');
     Geolocation.getCurrentPosition(
@@ -205,18 +184,25 @@ const MapViewComponent = () => {
                     />
                     <Button title="Check-In" onPress={() => handleCheckIn(marker)} />
                   </View>
-
-                  <Button
-                    title={isRecording ? "Stop Recording" : "Memo"}
-                    onPress={() => {
-                      if (isRecording) {
-                        stopRecordingAndPlayBack(marker.id);
-                      } else {
-                        startRecording();
-                      }
-                    }}
-                  />
-                  <Icon name="mic" size={30} color="#000" />
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => {
+                        if (isRecording) {
+                          stopRecordingAndPlayBack(marker.id);
+                        } else {
+                          startRecording();
+                        }
+                      }}>
+                    <Button
+                      title={isRecording ? "Stop" : "Memo"}
+                      onPress={() => {
+                        if (isRecording) {
+                          stopRecordingAndPlayBack(marker.id);
+                        } else {
+                          startRecording();
+                        }
+                      }}
+                    />
+                    <Icon name="mic" size={20} color="#00ace8" />
+                  </View>
                 </View>
               </View>
             </Callout>
@@ -271,6 +257,7 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
   },
   locationButton: {
     position: 'absolute', // Position the button over the map
@@ -281,12 +268,12 @@ const styles = StyleSheet.create({
     borderRadius: 20, // Round the corners (optional)
   },
   checkboxContainer: {
-    width: 24,
-    height: 24,
+    width: 18,
+    height: 18,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#000',
+    borderColor: "#00ace8",
     marginRight: 8,
   },
   checkboxCheck: {
