@@ -1,3 +1,5 @@
+import Config from 'react-native-config';
+
 export default {
-  openai_url: 'https://harmony-llm-api.fly.dev/openai/upload-audio',
+  openai_url: Config.OPENAI_URL ?? '',
 };

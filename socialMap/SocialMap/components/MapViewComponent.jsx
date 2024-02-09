@@ -1,9 +1,11 @@
+// MapViewComponent.jsx
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, Button, StyleSheet, Dimensions, Platform } from 'react-native';
 import MapView, { Marker, Callout } from 'react-native-maps';
 import { AudioRecorder, AudioUtils } from 'react-native-audio';
 import Sound from 'react-native-sound';
-import markers from '../assets/locations/tf.json';
+import { getMapMarkers } from '../apis/markers';
+import { speechToText } from '../apis/openai';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -18,9 +20,13 @@ const MapViewComponent = () => {
 
   useEffect(() => {
     const getMarkers = async () => {
-      const markers = await getMapMarkers('af')
+      const markers = await getMapMarkers()
       setMarkers(markers)
     }
+    getMarkers()
+  }, [])
+
+  useEffect(() => {
     AudioRecorder.requestAuthorization().then((isAuthorised) => {
       setHasPermission(isAuthorised);
       if (isAuthorised) {
@@ -32,7 +38,6 @@ const MapViewComponent = () => {
         });
       }
     });
-    getMarkers()
   }, [])
 
   useEffect(() => {
@@ -60,6 +65,9 @@ const MapViewComponent = () => {
     await AudioRecorder.stopRecording();
     setIsRecording(false);
     // Playback the recording
+    console.log('audiPath', audioPath)
+    const transcription = await speechToText(audioPath)
+    console.log(transcription)
     const sound = new Sound(audioPath, '', (error) => {
       if (error) {
         console.log('Failed to load the sound', error);
@@ -87,7 +95,7 @@ const MapViewComponent = () => {
           latitudeDelta: 40,
           longitudeDelta: 40,
         }}>
-        {markers && markers.map((marker, index) => (
+        {markers.length > 0 && markers.map((marker, index) => (
           <Marker
             key={index}
             identifier={marker.id} // Use identifier for fitToSuppliedMarkers

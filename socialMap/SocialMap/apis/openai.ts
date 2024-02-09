@@ -19,5 +19,6 @@ export async function speechToText(filePath: string): Promise<string> {
     data: formData,
   };
   const response = await axios.request(request);
+  console.log(response);
   return response.data;
 }

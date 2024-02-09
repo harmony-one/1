@@ -1,6 +1,6 @@
 import axios from 'axios';
 import markers from '../assets/locations/tf.json';
-export async function getMapMarkers(mapType = 'tf') {
+export async function getMapMarkers(mapType = 'tf'): Promise<any> {
   try {
     switch (mapType) {
       case 'tf':

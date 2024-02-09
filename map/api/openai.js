@@ -1,5 +1,5 @@
-import * as FileSystem from 'expo-file-system'
 import axios from 'axios' 
+import { config } from '../config';
 
 export async function speechToText (filePath) {
   const filename = filePath.split('recordings/')[1]
@@ -9,16 +9,17 @@ export async function speechToText (filePath) {
       name: filename,
       type: 'audio/wav',
     });
-  let config = {
+  let request = {
     method: "post",
     maxBodyLength: Infinity,
-    url: "https://harmony-llm-api.fly.dev/openai/upload-audio",
+    url: config.openai_url,
     headers: {
       "Content-Type": "audio/wav"
     },
     data: formData,
   };
-  const response = await axios.request(config)
+  console.log(request)
+  const response = await axios.request(request)
   console.log(response.data)
   return response.data
 }
