@@ -3,6 +3,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, Button, StyleSheet, Dimensions, Platform, TouchableOpacity, Alert, CheckmarkBox } from 'react-native';
 import MapView, { Marker, Callout } from 'react-native-maps';
 import { AudioRecorder, AudioUtils } from 'react-native-audio';
+import Sound from 'react-native-sound';
+import Clipboard from '@react-native-clipboard/clipboard';
 import { getMapMarkers } from '../apis/markers';
 import { speechToText } from '../apis/openai';
 import Toast from 'react-native-toast-message';
@@ -29,6 +31,15 @@ const MapViewComponent = () => {
     const newItem = { id, text };
     setItems(currentItems => [...currentItems, newItem]);
   };
+
+  const copyToClipboard = (text) => {
+    Clipboard.setString(text);
+    Toast.show({
+      type: 'success',
+      text1: 'Copied address',
+    });
+  };
+  
 
   useEffect(() => {
     const getMarkers = async () => {
@@ -180,9 +191,9 @@ const MapViewComponent = () => {
             </View>
             <Callout onPress={() => handlePress(marker)}>
               <View style={styles.calloutView}>
+              <TouchableOpacity onPress={() => copyToClipboard(marker.address)}>
                 <Text style={styles.calloutTitle}>{marker.name}</Text>
-                <Text style={styles.calloutDescription}>{marker.address}</Text>
-
+              </TouchableOpacity>
                 <View style={styles.buttonContainer}>
                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <CheckmarkBox
