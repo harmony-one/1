@@ -72,7 +72,7 @@ const MapViewComponent = () => {
 
     // Configure the request headers
     const headers = {
-      'Authorization': 'Bearer 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', // Replace with your actual OpenAI API key
+      'Authorization': 'Bearer Token', // Replace with your actual OpenAI API key
       'Content-Type': 'multipart/form-data',
     };
 
