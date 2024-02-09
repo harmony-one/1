@@ -209,8 +209,7 @@ const MapViewComponent = () => {
                           startRecording();
                         }
                       }}>
-                    <Button
-                      title={isRecording ? "Stop" : "Memo"}
+                    <TouchableOpacity
                       onPress={() => {
                         if (isRecording) {
                           stopRecordingAndPlayBack(marker.id);
@@ -218,8 +217,10 @@ const MapViewComponent = () => {
                           startRecording();
                         }
                       }}
-                    />
-                    <Icon name="mic" size={20} color="#00ace8" />
+                      style={styles.customButton}
+                    >
+                      <Icon name={isRecording ? "mic" : "mic-none"} size={25} color={isRecording ? "green" : "#00ace8"} />
+                    </TouchableOpacity>
                   </View>
                 </View>
               </View>
@@ -297,6 +298,14 @@ const styles = StyleSheet.create({
   checkboxCheck: {
     fontSize: 18,
   },
+  customButton: {
+    padding: 10,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#FFF',
+  },
+  
 });
 
 export default MapViewComponent;
