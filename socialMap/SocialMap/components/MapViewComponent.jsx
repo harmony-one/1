@@ -15,6 +15,16 @@ import openInAppBrowser from './BrowserView';
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
+import { NativeModules } from 'react-native';
+const { CustomSettingsManager } = NativeModules;
+
+const fetchMapVersion = async () => {
+  CustomSettingsManager.getMapVersion((mapVersion) => {
+    console.log('Map Version from Settings:', mapVersion);
+  });
+};
+
+
 const MapViewComponent = () => {
   // State for managing recording
   const [markers, setMarkers] = useState([])
@@ -38,6 +48,7 @@ const MapViewComponent = () => {
       setMarkers(markers)
     }
     getMarkers()
+    fetchMapVersion()
   }, [])
 
   useEffect(() => {

@@ -14,6 +14,8 @@
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		7699B88040F8A987B510C191 /* libPods-SocialMap-SocialMapTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 19F6CBCC0A4E27FBF8BF4A61 /* libPods-SocialMap-SocialMapTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		F79D5C662B77D68700440E57 /* CustomSettingsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = F79D5C652B77D68700440E57 /* CustomSettingsManager.m */; };
+		F79D5C6A2B77DE8900440E57 /* CustomSettings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = F79D5C692B77DE8900440E57 /* CustomSettings.bundle */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -44,6 +46,9 @@
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = SocialMap/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		89C6BE57DB24E9ADA2F236DE /* Pods-SocialMap-SocialMapTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SocialMap-SocialMapTests.release.xcconfig"; path = "Target Support Files/Pods-SocialMap-SocialMapTests/Pods-SocialMap-SocialMapTests.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
+		F79D5C642B77D68700440E57 /* CustomSettingsManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CustomSettingsManager.h; sourceTree = "<group>"; };
+		F79D5C652B77D68700440E57 /* CustomSettingsManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CustomSettingsManager.m; sourceTree = "<group>"; };
+		F79D5C692B77DE8900440E57 /* CustomSettings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = CustomSettings.bundle; path = SocialMap/CustomSettings.bundle; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -86,6 +91,7 @@
 		13B07FAE1A68108700A75B9A /* SocialMap */ = {
 			isa = PBXGroup;
 			children = (
+				F79D5C692B77DE8900440E57 /* CustomSettings.bundle */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.mm */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
@@ -116,6 +122,8 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				F79D5C642B77D68700440E57 /* CustomSettingsManager.h */,
+				F79D5C652B77D68700440E57 /* CustomSettingsManager.m */,
 				13B07FAE1A68108700A75B9A /* SocialMap */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* SocialMapTests */,
@@ -243,6 +251,7 @@
 			files = (
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
+				F79D5C6A2B77DE8900440E57 /* CustomSettings.bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -393,6 +402,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */,
+				F79D5C662B77D68700440E57 /* CustomSettingsManager.m in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
