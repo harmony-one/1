@@ -157,6 +157,10 @@ const MapViewComponent = () => {
     </TouchableOpacity>
   );
 
+  function sanitizeURL(str) {
+    return str.replace(/[^a-zA-Z0-9\-_\.!~*'()]/g, '');
+  }
+
   return (
     <View style={styles.container}>
       <MapView
@@ -182,7 +186,7 @@ const MapViewComponent = () => {
             </View>
             <Callout onPress={() => handlePress(marker)}>
               <View style={styles.calloutView}>
-              <TouchableOpacity onPress={() => openInAppBrowser(`http://www.j.country/tag/${marker.name}`)}>
+              <TouchableOpacity onPress={() => openInAppBrowser(`https://www.j.country/tag/${sanitizeURL(marker.name)}`)}>
                 <Text style={styles.calloutTitle}>{marker.name}</Text>
               </TouchableOpacity>
                 <View style={styles.buttonContainer}>
