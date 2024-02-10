@@ -182,7 +182,7 @@ const MapViewComponent = () => {
             </View>
             <Callout onPress={() => handlePress(marker)}>
               <View style={styles.calloutView}>
-              <TouchableOpacity onPress={() => openInAppBrowser(`http://www.jn.country/$(marker.name)`)}>
+              <TouchableOpacity onPress={() => openInAppBrowser(`http://www.j.country/tag/${marker.name}`)}>
                 <Text style={styles.calloutTitle}>{marker.name}</Text>
               </TouchableOpacity>
                 <View style={styles.buttonContainer}>
