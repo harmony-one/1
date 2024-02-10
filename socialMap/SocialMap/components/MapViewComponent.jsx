@@ -4,12 +4,12 @@ import { View, Text, Button, StyleSheet, Dimensions, Platform, TouchableOpacity,
 import MapView, { Marker, Callout } from 'react-native-maps';
 import { AudioRecorder, AudioUtils } from 'react-native-audio';
 import Sound from 'react-native-sound';
-import Clipboard from '@react-native-clipboard/clipboard';
 import { getMapMarkers } from '../apis/markers';
 import { speechToText } from '../apis/openai';
 import Toast from 'react-native-toast-message';
 import Geolocation from '@react-native-community/geolocation';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import openInAppBrowser from './BrowserView';
 
 
 const windowWidth = Dimensions.get('window').width;
@@ -31,15 +31,6 @@ const MapViewComponent = () => {
     const newItem = { id, text };
     setItems(currentItems => [...currentItems, newItem]);
   };
-
-  const copyToClipboard = (text) => {
-    Clipboard.setString(text);
-    Toast.show({
-      type: 'success',
-      text1: 'Copied address',
-    });
-  };
-  
 
   useEffect(() => {
     const getMarkers = async () => {
@@ -191,7 +182,7 @@ const MapViewComponent = () => {
             </View>
             <Callout onPress={() => handlePress(marker)}>
               <View style={styles.calloutView}>
-              <TouchableOpacity onPress={() => copyToClipboard(marker.address)}>
+              <TouchableOpacity onPress={() => openInAppBrowser(`http://www.jn.country/$(marker.name)`)}>
                 <Text style={styles.calloutTitle}>{marker.name}</Text>
               </TouchableOpacity>
                 <View style={styles.buttonContainer}>
