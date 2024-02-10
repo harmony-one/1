@@ -1,5 +1,4 @@
 /* eslint-disable react/react-in-jsx-scope */
-import {View} from 'react-native';
 import Toast from 'react-native-toast-message';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
@@ -23,11 +22,11 @@ function MyStack() {
 
 export default function App() {
   return (
-    <View>
+    <>
       <NavigationContainer>
         <MyStack />
       </NavigationContainer>
       <Toast />
-    </View>
+    </>
   );
 }
