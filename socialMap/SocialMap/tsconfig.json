@@ -6,4 +6,7 @@
     "esModuleInterop": true,
     "allowJs": true,
   },
+  "include": [
+    "src"
+  ]
 }

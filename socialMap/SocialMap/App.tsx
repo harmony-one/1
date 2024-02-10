@@ -3,7 +3,7 @@
 import Toast from 'react-native-toast-message';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
-import MapViewComponent from './components/MapViewComponent';
+import MapViewComponent from './src/screens/MapViewComponent';
 
 const Stack = createStackNavigator();
 
