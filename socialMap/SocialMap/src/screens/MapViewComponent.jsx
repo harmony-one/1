@@ -18,6 +18,7 @@ import {speechToText} from '../apis/openai';
 import Toast from 'react-native-toast-message';
 import Geolocation from '@react-native-community/geolocation';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import openInAppBrowser from '../components/BrowserView';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -36,7 +37,7 @@ const MapViewComponent = () => {
 
   useEffect(() => {
     const getMarkers = async () => {
-      const markers = await getMapMarkers('ffdgdf');
+      const markers = await getMapMarkers();
       setMarkers(markers);
     };
     getMarkers();
@@ -170,6 +171,9 @@ const MapViewComponent = () => {
     </TouchableOpacity>
   );
 
+  function sanitizeURL(str) {
+    return str.replace(/[^a-zA-Z0-9\-_\.!~*'()]/g, '');
+  }
   return (
     <View style={styles.container}>
       {!showPosts ? (<MapView
@@ -198,13 +202,15 @@ const MapViewComponent = () => {
               </View>
               <Callout onPress={() => handlePress(marker)}>
                 <View style={styles.calloutView}>
-                  <TouchableOpacity onPress={() => setShowPosts(true)}>
+                  <TouchableOpacity onPress={() => openInAppBrowser(`https://www.j.country/tag/${sanitizeURL(marker.name)}`)}>
                     <Text style={styles.calloutTitle}>{marker.name}</Text>
                   </TouchableOpacity>
+                  {/* <TouchableOpacity onPress={() => setShowPosts(true)}>
+                    <Text style={styles.calloutTitle}>{marker.name}</Text>
+                  </TouchableOpacity> */}
                   <Text style={styles.calloutDescription}>
                     {marker.address}
                   </Text>
-
                   <View style={styles.buttonContainer}>
                     <View style={{flexDirection: 'row', alignItems: 'center'}}>
                       <CheckmarkBox
@@ -225,8 +231,8 @@ const MapViewComponent = () => {
                           startRecording();
                         }
                       }}>
-                      <Text>{isRecording ? 'Stop' : 'Memo'}</Text>
-                      <Icon name="mic" size={20} color="#00ace8" />
+                      {/* <Text>{isRecording ? 'Stop' : 'Memo'}</Text> */}
+                      <Icon name={isRecording ? "mic" : "mic-none"} size={25} color={isRecording ? "green" : "#00ace8"} />
                     </TouchableOpacity>
                   </View>
                 </View>
