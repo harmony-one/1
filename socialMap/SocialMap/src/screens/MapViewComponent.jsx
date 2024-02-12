@@ -10,6 +10,8 @@ import {
   TouchableOpacity,
   Alert,
   CheckmarkBox,
+  GestureResponderHandlers
+  
 } from 'react-native';
 import MapView, {Marker, Callout} from 'react-native-maps';
 import {AudioRecorder, AudioUtils} from 'react-native-audio';
@@ -19,6 +21,10 @@ import Toast from 'react-native-toast-message';
 import Geolocation from '@react-native-community/geolocation';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import openInAppBrowser from '../components/BrowserView';
+import ActionSheet from 'react-native-actions-sheet';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+
+
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -34,6 +40,8 @@ const MapViewComponent = () => {
     AudioUtils.DocumentDirectoryPath + `/voiceMemo_${Date.now()}.mp4`,
   );
   const mapRef = useRef(null);
+  const actionSheetRef = useRef(null);
+
 
   useEffect(() => {
     const getMarkers = async () => {
@@ -130,6 +138,14 @@ const MapViewComponent = () => {
 
   const handlePress = marker => {
     console.log('Button pressed for:', marker.name);
+
+    const newRegion = {
+      latitude: marker.latitude,
+      longitude: marker.longitude,
+      latitudeDelta: 0.01,
+      longitudeDelta: 0.01,
+    };
+    mapRef.current.animateToRegion(newRegion, 1000); // Added duration for the animation
   };
 
   const toggleCheckIn = id => {
@@ -163,6 +179,11 @@ const MapViewComponent = () => {
       },
       {enableHighAccuracy: true},
     );
+  };
+
+  const actionSheet = () => {
+    console.log('Action Sheet');
+      actionSheetRef.current?.show();
   };
 
   const CheckmarkBox = ({isChecked, onPress}) => (
@@ -205,9 +226,6 @@ const MapViewComponent = () => {
                   <TouchableOpacity onPress={() => openInAppBrowser(`https://www.j.country/tag/${sanitizeURL(marker.name)}`)}>
                     <Text style={styles.calloutTitle}>{marker.name}</Text>
                   </TouchableOpacity>
-                  {/* <TouchableOpacity onPress={() => setShowPosts(true)}>
-                    <Text style={styles.calloutTitle}>{marker.name}</Text>
-                  </TouchableOpacity> */}
                   <Text style={styles.calloutDescription}>
                     {marker.address}
                   </Text>
@@ -232,7 +250,7 @@ const MapViewComponent = () => {
                         }
                       }}>
                       {/* <Text>{isRecording ? 'Stop' : 'Memo'}</Text> */}
-                      <Icon name={isRecording ? "mic" : "mic-none"} size={25} color={isRecording ? "green" : "#00ace8"} />
+                      <Icon name={isRecording ? "mic" : "mic-none"} size={30} color={isRecording ? "green" : "#00ace8"} />
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -247,11 +265,23 @@ const MapViewComponent = () => {
       )}
       <View style={styles.locationButton}>
         <TouchableOpacity onPress={getCurrentLocation}>
-          {/* // <Text style={styles.buttonText}>My Location</Text>
-          <ion-icon name="locate-outline"></ion-icon> */}
-          <Icon name="my-location" size={30} color="#00ace8" />
+          <Icon name="near-me" size={25} color="#00ace8" />
         </TouchableOpacity>
       </View>
+      <View style={styles.actionButton}>
+        <TouchableOpacity onPress={actionSheet}>
+          <Icon name="menu" size={25} color="#00ace8" />
+        </TouchableOpacity>
+      </View>
+      <ActionSheet ref={actionSheetRef}>
+        <View>
+          {markers.map((marker, index) => (
+            <TouchableOpacity key={index} onPress={() => handlePress(marker)} style={{ padding: 20 }}>
+              <Text>{marker.name || 'Default Address'}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </ActionSheet>
     </View>
   );
 };
@@ -302,6 +332,14 @@ const styles = StyleSheet.create({
     backgroundColor: 'white', // Set the background color (optional)
     borderRadius: 20, // Round the corners (optional)
   },
+  actionButton: {
+    position: 'absolute', // Position the button over the map
+    bottom: 80, // Distance from the bottom of the container
+    right: 10, // Distance from the right of the container
+    padding: 10, // Add some padding for visual appeal (optional)
+    backgroundColor: 'white', // Set the background color (optional)
+    borderRadius: 20, // Round the corners (optional)
+  },
   checkboxContainer: {
     width: 18,
     height: 18,
@@ -313,7 +351,10 @@ const styles = StyleSheet.create({
   },
   checkboxCheck: {
     fontSize: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
+ 
 });
 
 export default MapViewComponent;
