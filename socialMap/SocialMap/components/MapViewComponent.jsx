@@ -3,11 +3,13 @@ import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, Button, StyleSheet, Dimensions, Platform, TouchableOpacity, Alert, CheckmarkBox } from 'react-native';
 import MapView, { Marker, Callout } from 'react-native-maps';
 import { AudioRecorder, AudioUtils } from 'react-native-audio';
+import Sound from 'react-native-sound';
 import { getMapMarkers } from '../apis/markers';
 import { speechToText } from '../apis/openai';
 import Toast from 'react-native-toast-message';
 import Geolocation from '@react-native-community/geolocation';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import openInAppBrowser from './BrowserView';
 
 
 const windowWidth = Dimensions.get('window').width;
@@ -155,6 +157,10 @@ const MapViewComponent = () => {
     </TouchableOpacity>
   );
 
+  function sanitizeURL(str) {
+    return str.replace(/[^a-zA-Z0-9\-_\.!~*'()]/g, '');
+  }
+
   return (
     <View style={styles.container}>
       <MapView
@@ -180,9 +186,9 @@ const MapViewComponent = () => {
             </View>
             <Callout onPress={() => handlePress(marker)}>
               <View style={styles.calloutView}>
+              <TouchableOpacity onPress={() => openInAppBrowser(`https://www.j.country/tag/${sanitizeURL(marker.name)}`)}>
                 <Text style={styles.calloutTitle}>{marker.name}</Text>
-                <Text style={styles.calloutDescription}>{marker.address}</Text>
-
+              </TouchableOpacity>
                 <View style={styles.buttonContainer}>
                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <CheckmarkBox
@@ -198,8 +204,7 @@ const MapViewComponent = () => {
                           startRecording();
                         }
                       }}>
-                    <Button
-                      title={isRecording ? "Stop" : "Memo"}
+                    <TouchableOpacity
                       onPress={() => {
                         if (isRecording) {
                           stopRecordingAndPlayBack(marker.id);
@@ -207,8 +212,10 @@ const MapViewComponent = () => {
                           startRecording();
                         }
                       }}
-                    />
-                    <Icon name="mic" size={20} color="#00ace8" />
+                      style={styles.customButton}
+                    >
+                      <Icon name={isRecording ? "mic" : "mic-none"} size={25} color={isRecording ? "green" : "#00ace8"} />
+                    </TouchableOpacity>
                   </View>
                 </View>
               </View>
@@ -286,6 +293,14 @@ const styles = StyleSheet.create({
   checkboxCheck: {
     fontSize: 18,
   },
+  customButton: {
+    padding: 10,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#FFF',
+  },
+  
 });
 
 export default MapViewComponent;

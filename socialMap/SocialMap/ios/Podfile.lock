@@ -1125,11 +1125,15 @@ PODS:
     - React
   - RNAudioRecorderPlayer (3.6.6):
     - React-Core
+  - RNCClipboard (1.13.2):
+    - React-Core
   - RNCMaskedView (0.1.11):
     - React
   - RNGestureHandler (2.15.0):
     - glog
     - RCT-Folly (= 2022.05.16.00)
+    - React-Core
+  - RNInAppBrowser (3.7.0):
     - React-Core
   - RNReanimated (3.6.2):
     - glog
@@ -1231,8 +1235,10 @@ DEPENDENCIES:
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
   - RNAudio (from `../node_modules/react-native-audio`)
   - RNAudioRecorderPlayer (from `../node_modules/react-native-audio-recorder-player`)
+  - "RNCClipboard (from `../node_modules/@react-native-clipboard/clipboard`)"
   - "RNCMaskedView (from `../node_modules/@react-native-community/masked-view`)"
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
+  - RNInAppBrowser (from `../node_modules/react-native-inappbrowser-reborn`)
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNSound (from `../node_modules/react-native-sound`)
@@ -1363,10 +1369,14 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-audio"
   RNAudioRecorderPlayer:
     :path: "../node_modules/react-native-audio-recorder-player"
+  RNCClipboard:
+    :path: "../node_modules/@react-native-clipboard/clipboard"
   RNCMaskedView:
     :path: "../node_modules/@react-native-community/masked-view"
   RNGestureHandler:
     :path: "../node_modules/react-native-gesture-handler"
+  RNInAppBrowser:
+    :path: "../node_modules/react-native-inappbrowser-reborn"
   RNReanimated:
     :path: "../node_modules/react-native-reanimated"
   RNScreens:
@@ -1444,8 +1454,10 @@ SPEC CHECKSUMS:
   ReactCommon: 840a955d37b7f3358554d819446bffcf624b2522
   RNAudio: cae2991f2dccb75163f260b60da8051717b959fa
   RNAudioRecorderPlayer: f790fc1afb118552ae6285d60adde52ee6b5d9ef
+  RNCClipboard: 60fed4b71560d7bfe40e9d35dea9762b024da86d
   RNCMaskedView: 0e1bc4bfa8365eba5fbbb71e07fbdc0555249489
   RNGestureHandler: deda62b8339496ba721a45e0f3e2d7a319932cee
+  RNInAppBrowser: e36d6935517101ccba0e875bac8ad7b0cb655364
   RNReanimated: 5589be82dc26b3f94738eb7c6b1f942787532b25
   RNScreens: b582cb834dc4133307562e930e8fa914b8c04ef2
   RNSound: 6c156f925295bdc83e8e422e7d8b38d33bc71852
