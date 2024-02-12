@@ -1,7 +1,0 @@
-[
-  {"id": 1, "name": "Seedstock Brewery", "longitude": -105.03502065874494, "latitude": 39.740139721047306, "address": "3610 W Colfax Ave, Denver, CO 80204"},
-  {"id": 2, "name": "Improper City", "longitude": -104.97922286131806, "latitude": 39.765239724627264, "address": "3201 Walnut St, Denver, CO 80205"},
-  {"id": 3, "name": "Upper Larimer", "longitude": -104.97969581349145, "latitude": 39.76271488736177, "address": "3034 Larimer St, Denver, CO 80205"},
-  {"id": 4, "name": "Bluebird Theater", "longitude": -104.94846570185331, "latitude": 39.74045012396084, "address": "3317 E Colfax Ave, Denver, CO 80206"},
-  {"id": 5, "name": "Office Space", "longitude": -104.99323074232763, "latitude": 39.73647392841151, "address": "1261 Delaware St, Denver, CO 80204"}
-]
