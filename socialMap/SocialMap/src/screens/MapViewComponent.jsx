@@ -23,7 +23,8 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import openInAppBrowser from '../components/BrowserView';
 import ActionSheet from 'react-native-actions-sheet';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-
+import firestore from '@react-native-firebase/firestore';
+import CheckInButton from '../components/CheckInButton';
 
 
 const windowWidth = Dimensions.get('window').width;
@@ -35,6 +36,7 @@ const MapViewComponent = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [hasPermission, setHasPermission] = useState(false);
   const [checkedIn, setCheckedIn] = useState({});
+  const [markerCounts, setMarkerCounts] = useState({});
   const [showPosts, setShowPosts] = useState(false)
   const [audioPath, setAudioPath] = useState(
     AudioUtils.DocumentDirectoryPath + `/voiceMemo_${Date.now()}.mp4`,
@@ -75,6 +77,36 @@ const MapViewComponent = () => {
         },
       );
     }
+  }, [markers]);
+
+  useEffect(() => {
+    const fetchCounts = async () => {
+      if (markers.length === 0) {
+        return;
+      }
+
+      const countsMap = {};
+      const fetchPromises = markers.map((marker) => {
+        const documentId = `${marker.longitude}${marker.latitude}`;
+        return firestore()
+          .collection('checkins')
+          .doc(documentId)
+          .get()
+          .then((docSnapshot) => {
+            if (docSnapshot.exists) {
+              countsMap[documentId] = docSnapshot.data().count;
+            }
+          })
+          .catch((error) => {
+            console.error(`Error fetching count for marker ${documentId}:`, error);
+          });
+      });
+
+      await Promise.all(fetchPromises);
+      setMarkerCounts(countsMap);
+    };
+
+    fetchCounts();
   }, [markers]);
 
   // Handle recording start
@@ -148,16 +180,44 @@ const MapViewComponent = () => {
     mapRef.current.animateToRegion(newRegion, 1000); // Added duration for the animation
   };
 
-  const toggleCheckIn = id => {
-    setCheckedIn(prev => ({
-      ...prev,
-      [id]: !prev[id],
+  const toggleCheckIn = (markerId) => {
+    setCheckedIn(prevCheckedIn => ({
+      ...prevCheckedIn,
+      [markerId]: !prevCheckedIn[markerId],
     }));
   };
+  
 
-  const handleCheckIn = marker => {
-    console.log('marker checked in', marker);
+  const handleCheckIn = async (marker) => {
+    const documentId = `${marker.longitude}${marker.latitude}`;
+    const currentlyCheckedIn = !!checkedIn[marker.id];
+    const incrementValue = currentlyCheckedIn ? -1 : 1;
+    const docRef = firestore().collection('checkins').doc(documentId);
+  
+    try {
+      await docRef.update({
+        count: firestore.FieldValue.increment(incrementValue)
+      });
+  
+      setCheckedIn(prevCheckedIn => ({
+        ...prevCheckedIn,
+        [marker.id]: !currentlyCheckedIn,
+      }));
+
+      const doc = await docRef.get();
+      if (doc.exists) {
+        setMarkerCounts(prevCounts => ({
+          ...prevCounts,
+          [documentId]: doc.data().count,
+        }));
+      }
+    } catch (error) {
+      console.error("Error updating check-in status:", error);
+    }
   };
+  
+  
+  
 
   const getCurrentLocation = () => {
     console.log('Attempting to get current position...');
@@ -206,57 +266,56 @@ const MapViewComponent = () => {
           latitudeDelta: 40,
           longitudeDelta: 40,
         }}>
-        {markers.length > 0 &&
-          markers.map((marker, index) => (
-            <Marker
-              key={index}
-              identifier={marker.id} // Use identifier for fitToSuppliedMarkers
-              coordinate={{
+        {markers.length > 0 && markers.map((marker, index) => {
+    const documentId = `${marker.longitude}${marker.latitude}`;
+    const count = markerCounts[documentId];
+
+    return (
+        <Marker
+            key={index}
+            identifier={marker.id}
+            coordinate={{
                 latitude: marker.latitude,
                 longitude: marker.longitude,
-              }}
-              title={marker.name}
-              description={marker.address}>
-              <View style={styles.circle}>
-                {/* change "1" to reflect count for number of checkins */}
-                <Text style={styles.number}>{marker.id}</Text>
-              </View>
-              <Callout onPress={() => handlePress(marker)}>
+            }}
+            title={marker.name}
+            description={marker.address}>
+            <View style={styles.circle}>
+                <Text style={styles.number}>{count !== undefined ? count : '...'}</Text>
+            </View>
+            <Callout onPress={() => handlePress(marker)}>
                 <View style={styles.calloutView}>
-                  <TouchableOpacity onPress={() => openInAppBrowser(`https://www.j.country/tag/${sanitizeURL(marker.name)}`)}>
-                    <Text style={styles.calloutTitle}>{marker.name}</Text>
-                  </TouchableOpacity>
-                  <Text style={styles.calloutDescription}>
-                    {marker.address}
-                  </Text>
-                  <View style={styles.buttonContainer}>
-                    <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                      <CheckmarkBox
-                        isChecked={!!checkedIn[marker]}
-                        onPress={() => toggleCheckIn(marker)}
-                      />
-                      <Button
-                        title="Check-In"
-                        onPress={() => handleCheckIn(marker)}
-                      />
-                    </View>
-                    <TouchableOpacity
-                      style={{flexDirection: 'row', alignItems: 'center'}}
-                      onPress={() => {
-                        if (isRecording) {
-                          stopRecordingAndPlayBack(marker.id);
-                        } else {
-                          startRecording();
-                        }
-                      }}>
-                      {/* <Text>{isRecording ? 'Stop' : 'Memo'}</Text> */}
-                      <Icon name={isRecording ? "mic" : "mic-none"} size={30} color={isRecording ? "green" : "#00ace8"} />
+                    <TouchableOpacity onPress={() => openInAppBrowser(`https://www.j.country/tag/${sanitizeURL(marker.name)}`)}>
+                        <Text style={styles.calloutTitle}>{marker.name}</Text>
                     </TouchableOpacity>
-                  </View>
+                    <Text style={styles.calloutDescription}>{marker.address}</Text>
+                    <View style={styles.buttonContainer}>
+                    <CheckInButton
+                      isChecked={!!checkedIn[marker.id]}
+                      onPress={() => {
+                        toggleCheckIn(marker.id);
+                        handleCheckIn(marker);
+                      }}
+                    />
+              {/* Recording Button */}
+              <TouchableOpacity
+                style={{ flexDirection: 'row', alignItems: 'center' }}
+                onPress={() => {
+                  if (isRecording) {
+                    stopRecordingAndPlayBack(marker.id);
+                  } else {
+                    startRecording(marker);
+                  }
+                }}>
+                <Icon name={isRecording ? "mic" : "mic-none"} size={30} color={isRecording ? "red" : "#00ace8"} />
+              </TouchableOpacity>
+              </View>
                 </View>
-              </Callout>
-            </Marker>
-          ))}
+            </Callout>
+        </Marker>
+    );
+})}
+
       </MapView>) : (
         <View >
           {/* place PostsComponent */}
@@ -279,6 +338,7 @@ const MapViewComponent = () => {
             <TouchableOpacity key={index} onPress={() => handlePress(marker)} style={{ padding: 20 }}>
               <Text>{marker.name || 'Default Address'}</Text>
             </TouchableOpacity>
+            
           ))}
         </View>
       </ActionSheet>
