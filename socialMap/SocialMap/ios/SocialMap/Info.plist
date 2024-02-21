@@ -57,5 +57,7 @@
 	</array>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>We need access to your location to show it on the map</string>
+	<key>CodePushDeploymentKey</key>
+<string>INSERT_YOUR_DEPLOYMENTKEY_HERE</string>
 </dict>
 </plist>
