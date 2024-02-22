@@ -112,6 +112,28 @@ const MapViewComponent = () => {
     fetchCounts();
   }, [markers]);
 
+  const getMarkerAddress = async (latitude, longitude) => {
+    const apiKey = 'YOUR_API_KEY_HERE'; // Replace this with your actual API key
+    const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`;
+
+    try {
+      const response = await fetch(url);
+      const json = await response.json();
+
+      if (json.status === 'OK') {
+        // Extract the full address from the first result
+        const address = json.results[0]?.formatted_address;
+        return address;
+      } else {
+        console.log('Geocoding API error:', json.status);
+        return null;
+      }
+    } catch (error) {
+      console.error('Failed to fetch address:', error);
+      return null;
+    }
+  };
+
   // Handle recording start
   const startRecording = async () => {
     if (!hasPermission) {
@@ -119,20 +141,86 @@ const MapViewComponent = () => {
       return;
     }
     setIsRecording(true);
-      const audio =
-        AudioUtils.DocumentDirectoryPath + `/voiceMemo_${Date.now()}.mp4`;
-      setAudioPath(audio);
-      AudioRecorder.prepareRecordingAtPath(audio, {
-        SampleRate: 22050,
-        Channels: 1,
-        AudioQuality: 'High',
-        AudioEncoding: 'aac',
-      });
+    const audio =
+      AudioUtils.DocumentDirectoryPath + `/voiceMemo_${Date.now()}.mp4`;
+    setAudioPath(audio);
+    AudioRecorder.prepareRecordingAtPath(audio, {
+      SampleRate: 22050,
+      Channels: 1,
+      AudioQuality: 'High',
+      AudioEncoding: 'aac',
+    });
     await AudioRecorder.startRecording();
   };
 
   // Handle recording stop and playback
   const stopRecordingAndPlayBack = async () => {
+    if (!isRecording) return;
+    await AudioRecorder.stopRecording();
+    setIsRecording(false);
+
+    try {
+      console.log(audioPath);
+      const result = await speechToText(audioPath); // Assuming this function exists and works as expected
+      if (result) {
+        console.log('Transcription result:', result);
+        Toast.show({
+          type: 'success',
+          text1: result,
+        });
+
+        Geolocation.getCurrentPosition(
+          async (position) => { // Corrected syntax for async callback
+            console.log('Current position:', position);
+            const { latitude, longitude } = position.coords;
+            const newRegion = {
+              latitude,
+              longitude,
+              latitudeDelta: 0.01, // Optionally adjust the latitudeDelta and longitudeDelta
+              longitudeDelta: 0.01,
+            };
+
+            const address = await getMarkerAddress(latitude, longitude); // Make sure this function is correctly defined
+            if (address) {
+              console.log('Current address:', address);
+              const newMarker = {
+                id: uuid.v4(), // Ensure uuid.v4() is correctly imported and used
+                name: 'New Marker', // Changed from uuid to a descriptive name
+                longitude: longitude,
+                latitude: latitude,
+                address: address,
+                checked: true,
+                counter: 1,
+                memoTranscription: result
+              }
+
+              setMarkers(prevMarkers => [...prevMarkers, newMarker]);
+              mapRef.current.animateToRegion(newRegion, 1000); // Added duration for animation
+            }
+          },
+          error => {
+            console.error('Error getting current position:', error);
+            Alert.alert('Error', 'Unable to fetch current location.');
+          },
+          { enableHighAccuracy: true },
+        );
+      } else {
+        Toast.show({
+          type: 'error',
+          text1: 'The voice memo could not be processed.',
+        });
+      }
+    } catch (error) {
+      console.error('Error processing audio:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Error processing audio.',
+      });
+    }
+  };
+
+  // Handle recording stop and playback
+  const stopRecordingAndPlayBackEventPopup = async id => {
     if (!isRecording) return;
     await AudioRecorder.stopRecording();
     setIsRecording(false);
@@ -146,52 +234,17 @@ const MapViewComponent = () => {
           type: 'success',
           text1: result,
         });
-
-        Geolocation.getCurrentPosition(
-          position => {
-            console.log('Current position:', position);
-            const { latitude, longitude } = position.coords;
-            const newRegion = {
-              latitude,
-              longitude,
-              latitudeDelta: 0.01, // Optionally adjust the latitudeDelta and longitudeDelta
-              longitudeDelta: 0.01,
-            };
-
-            const newMarker = {
-              id: uuid.v4(),
-              name: uuid.v4(),
-              longitude: longitude,
-              latitude: latitude,
-              address: 'N/A',
-              checked: true,
-              counter: 1,
-              memoTranscription: result
+        const updatedMarkers = markers.map(marker =>
+          marker.id === id
+            ? {
+              ...marker,
+              memoTranscription: marker.memoTranscription
+                ? `${marker.memoTranscription}\n${result}`
+                : result,
             }
-        
-            setMarkers(prevMarkers => [...prevMarkers, newMarker]);
-            mapRef.current.animateToRegion(newRegion);
-          },
-          error => {
-            console.error('Error getting current position:', error);
-            Alert.alert('Error', error.message);
-          },
-          { enableHighAccuracy: true },
+            : marker,
         );
-         
-       
-        // const updatedMarkers = markers.map(marker =>
-        //   marker.id === id
-        //     ? {
-        //       ...marker,
-        //       memoTranscription: marker.memoTranscription
-        //         ? `${marker.memoTranscription}\n${result}`
-        //         : result,
-        //     }
-        //     : marker,
-        // );
-        // setMarkers(updatedMarkers);
-
+        setMarkers(updatedMarkers);
         console.log('Current data store in array', markers);
       } else {
         Toast.show({
@@ -203,6 +256,28 @@ const MapViewComponent = () => {
       console.error('Error processing audio:', error);
     }
   };
+
+  // Handle recording start
+  const startRecordingEventPopup = async marker => {
+    if (!hasPermission) {
+      console.warn("Can't record, no permission granted!");
+      return;
+    }
+    setIsRecording(true);
+    if (hasTranscription(markers)) {
+      const audio =
+        AudioUtils.DocumentDirectoryPath + `/voiceMemo_${Date.now()}.mp4`;
+      setAudioPath(audio);
+      AudioRecorder.prepareRecordingAtPath(audio, {
+        SampleRate: 22050,
+        Channels: 1,
+        AudioQuality: 'High',
+        AudioEncoding: 'aac',
+      });
+    }
+    await AudioRecorder.startRecording();
+  };
+
 
   const handlePress = marker => {
     console.log('Button pressed for:', marker.name);
@@ -273,13 +348,6 @@ const MapViewComponent = () => {
     );
   };
 
-  const actionSheet = () => {
-    console.log('Action Sheet');
-    // actionSheetRef.current?.show();
-
-    actionSheetContainerRef.current?.show();
-  };
-
   const CheckmarkBox = ({ isChecked, onPress }) => (
     <TouchableOpacity onPress={onPress} style={styles.checkboxContainer}>
       {isChecked && <Text style={styles.checkboxCheck}>✓</Text>}
@@ -291,137 +359,161 @@ const MapViewComponent = () => {
   }
   return (
     <View style={styles.container}>
-      {!showPosts ? (<MapView
-        ref={mapRef}
-        style={styles.map}
-        initialRegion={{
-          latitude: 39.739235,
-          longitude: -104.99025,
-          latitudeDelta: 40,
-          longitudeDelta: 40,
-        }}>
-        {markers.length > 0 && markers.map((marker, index) => {
-          const documentId = `${marker.longitude}${marker.latitude}`;
-          const count = markerCounts[documentId];
-
-          return (
-            <Marker
-              key={index}
-              identifier={marker.id}
-              coordinate={{
-                latitude: marker.latitude,
-                longitude: marker.longitude,
-              }}
-              title={marker.name}
-              description={marker.address}>
-              {/* <View style={styles.circle}>
-                <Text style={styles.number}>{count !== undefined ? count : '...'}</Text>
-            </View> */}
-              <Callout onPress={() => handlePress(marker)}>
-                <View style={styles.calloutView}>
-                  <TouchableOpacity onPress={() => openInAppBrowser(`https://www.j.country/tag/${sanitizeURL(marker.name)}`)}>
-                    <Text style={styles.calloutTitle}>{marker.name}</Text>
-                  </TouchableOpacity>
-                  <Text style={styles.calloutDescription}>{marker.address}</Text>
-                  <View style={styles.buttonContainer}>
-                    <CheckInButton
-                      isChecked={!!checkedIn[marker.id]}
-                      onPress={() => {
-                        toggleCheckIn(marker.id);
-                        handleCheckIn(marker);
-                      }}
-                    />
-                    {/* Recording Button */}
-                    {/* <TouchableOpacity
-                      style={{ flexDirection: 'row', alignItems: 'center' }}
-                      onPress={() => {
-                        if (isRecording) {
-                          stopRecordingAndPlayBack(marker.id);
-                        } else {
-                          startRecording(marker);
-                        }
-                      }}>
-                      <Icon name={isRecording ? "mic" : "mic-none"} size={30} color={isRecording ? "red" : "#00ace8"} />
-                    </TouchableOpacity> */}
-                  </View>
-                </View>
-              </Callout>
-            </Marker>
-          );
-        })}
-
-      </MapView>) : (
-        <View >
-          {/* place PostsComponent */}
-          <Text size={'44px'}>Showing Posts</Text>
-        </View>
-      )}
-      <View style={styles.locationButton}>
-        <TouchableOpacity onPress={getCurrentLocation}>
-          <Icon name="near-me" size={25} color="#00ace8" />
-        </TouchableOpacity>
-      </View>
-      <View style={styles.actionButton}>
-        <TouchableOpacity onPress={actionSheet}>
-          <Icon name="menu" size={25} color="#00ace8" />
-        </TouchableOpacity>
-      </View>
-      <View style={styles.micButton}>
-        <TouchableOpacity onPress={() => {
-         
-          if (isRecording) {
-            stopRecordingAndPlayBack();
-          } else {
-            startRecording();
-          }
-        }}>
-          <Icon name={isRecording ? "mic" : "mic-none"} size={25} color={isRecording ? "red" : "#00ace8"} />
-        </TouchableOpacity>
-      </View>
-      <ActionSheet ref={actionSheetRef}>
-        <View>
-          {markers.map((marker, index) => (
-            <TouchableOpacity key={index} onPress={() => handlePress(marker)} style={{ padding: 20 }}>
-              <Text>{marker.name || 'Default Address'}</Text>
-            </TouchableOpacity>
-
-          ))}
-        </View>
-      </ActionSheet>
-
-      <ActionSheet style={styles.containerAction} ref={actionSheetContainerRef}>
-        <View style={styles.containerAction}>
-          <Carousel
-            //loop
-            width={100} // Fixed width
-            height={100} // Fixed height
-            data={markers}
-            layout={'stack-horizontal-right'}
-            onSnapToItem={index => setCurrentIndex(index)}
-            renderItem={({ item }) => (
-              <Image source={require('../assets/photo.png')} style={styles.imageAction} />
-            )}
-          />
-          <View style={styles.contentAction}>
-            <Text style={styles.textAction}>{markers[currentIndex]?.memoTranscription}</Text>
-            <Text style={styles.textAction}>{markers[currentIndex]?.latitude}</Text>
+      <View style={styles.mapContainer}>
+        {!showPosts ? (
+          <>
+            <MapView
+              ref={mapRef}
+              style={styles.map}
+              initialRegion={{
+                latitude: 39.739235,
+                longitude: -104.99025,
+                latitudeDelta: 40,
+                longitudeDelta: 40,
+              }}>
+              {markers.length > 0 &&
+                markers.map((marker, index) => (
+                  <Marker
+                    key={index}
+                    identifier={marker.id}
+                    coordinate={{
+                      latitude: marker.latitude,
+                      longitude: marker.longitude,
+                    }}
+                    title={marker.name}
+                    description={marker.address}>
+                    <Callout onPress={() => handlePress(marker)}>
+                      <View style={styles.calloutView}>
+                        <TouchableOpacity onPress={() => openInAppBrowser(`https://www.j.country/tag/${sanitizeURL(marker.name)}`)}>
+                          <Text style={styles.calloutTitle}>{marker.name}</Text>
+                        </TouchableOpacity>
+                        <Text style={styles.calloutDescription}>{marker.address}</Text>
+                        <View style={styles.buttonContainer}>
+                          <CheckInButton
+                            isChecked={!!checkedIn[marker.id]}
+                            onPress={() => {
+                              toggleCheckIn(marker.id);
+                              handleCheckIn(marker);
+                            }}
+                          />
+                          <TouchableOpacity
+                            style={{ flexDirection: 'row', alignItems: 'center' }}
+                            onPress={() => {
+                              if (isRecording) {
+                                stopRecordingAndPlayBackEventPopup(marker.id);
+                              } else {
+                                startRecordingEventPopup(marker);
+                              }
+                            }}>
+                            <Icon name={isRecording ? "mic" : "mic-none"} size={30} color={isRecording ? "red" : "#00ace8"} />
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+                    </Callout>
+                  </Marker>
+                ))}
+            </MapView>
+            <View style={styles.overlayButtons}>
+              <View style={styles.actionButton}>
+                <TouchableOpacity onPress={getCurrentLocation}>
+                  <Icon name="near-me" size={25} color="#00ace8" />
+                </TouchableOpacity>
+              </View>
+              {/* <View style={styles.actionButton}>
+                <TouchableOpacity onPress={actionSheet}>
+                  <Icon name="menu" size={25} color="#00ace8" />
+                </TouchableOpacity>
+              </View> */}
+              <View style={styles.micButton}>
+                <TouchableOpacity onPress={() => {
+                  if (isRecording) {
+                    stopRecordingAndPlayBack();
+                  } else {
+                    startRecording();
+                  }
+                }}>
+                  <Icon name={isRecording ? "mic" : "mic-none"} size={25} color={isRecording ? "red" : "#00ace8"} />
+                </TouchableOpacity>
+              </View>
+            </View>
+          </>
+        ) : (
+          <View>
+            {/* place PostsComponent */}
+            <Text size={'44px'}>Showing Posts</Text>
           </View>
-        </View>
-      </ActionSheet>
+        )}
+      </View>
+
+      <View style={styles.containerActionBottom}>
+        <Carousel
+          //loop
+          width={windowWidth - 10} // Use the width of the window/device
+          height={100} // Fixed height for each item
+          data={markers}
+          layout={'default'} // Use 'default' or other layouts as needed
+          onSnapToItem={index => {
+            console.log("New Index:", index); // Debugging log
+            setCurrentIndex(index);
+
+            const newRegion = {
+              latitude: markers[index].latitude,
+              longitude: markers[index].longitude,
+              latitudeDelta: 0.01,
+              longitudeDelta: 0.01,
+            };
+            mapRef.current.animateToRegion(newRegion);
+          }}
+          renderItem={({ item, index }) => (
+
+            <View style={styles.carouselItemContainer}>
+              <Image source={require('../assets/photo.png')} style={styles.imageAction} />
+              <View style={styles.contentAction}>
+                <Text style={styles.textAction}>{item.memoTranscription || 'No memo transcription available'}</Text>
+                <Text style={styles.textAction}>{item.address || 'No address available'}</Text>
+              </View>
+            </View>
+          )}
+        />
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    height: windowHeight,
-    width: windowWidth,
-    backgroundColor: '#404040',
+    flex: 1, // Use flex to fill the entire screen
+    // backgroundColor: '#404040',
+  },
+  mapContainer: {
+    flex: 1, // This will make the map container take up all available space except for what the containerActionBottom uses
   },
   map: {
-    ...StyleSheet.absoluteFill,
-    backgroundColor: '#404040',
+    ...StyleSheet.absoluteFillObject, // This will make the map fill the mapContainer
+  },
 
+  carouselItemContainer: {
+    flexDirection: 'row', // Align items horizontally
+    alignItems: 'center', // Center items vertically in the container
+    justifyContent: 'space-between', // Space between the image and text content
+    width: windowWidth, // Match the width of the carousel
+    paddingHorizontal: 10, // Add some horizontal padding
+  },
+
+
+  overlayButtons: {
+    position: 'absolute', // Position buttons over the map
+    bottom: 10, // Adjust based on your layout
+    right: 10,
+    alignItems: 'flex-end',
+  },
+  containerActionBottom: {
+    flexDirection: 'row',
+    padding: 10,
+    backgroundColor: '#404040',
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    // overflow: Platform.select({ android: 'hidden', ios: 'visible' }), // Example usage
   },
   // circle: {
   //   width: 40,
@@ -435,12 +527,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     padding: 10,
     alignItems: 'center',
-    backgroundColor: '#404040',
+    //  backgroundColor: '#404040',
     borderTopLeftRadius: 10, // Adjust the radius as needed
     borderTopRightRadius: 10,
   },
   contentAction: {
     flex: 1,
+    color: 'white', // Ensure this contrasts with the background
+    marginBottom: 8,
+    marginLeft: 10,
   },
   textAction: {
     fontSize: 12,
