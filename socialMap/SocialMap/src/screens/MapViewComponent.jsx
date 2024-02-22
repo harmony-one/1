@@ -436,8 +436,8 @@ const styles = StyleSheet.create({
     padding: 10,
     alignItems: 'center',
     backgroundColor: '#404040',
-    borderTopLeftRadius: 20, // Adjust the radius as needed
-    borderTopRightRadius: 20,
+    borderTopLeftRadius: 10, // Adjust the radius as needed
+    borderTopRightRadius: 10,
   },
   contentAction: {
     flex: 1,
