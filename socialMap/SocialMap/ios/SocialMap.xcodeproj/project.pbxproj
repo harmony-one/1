@@ -13,8 +13,8 @@
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		20440E3C7194097CDE3DBEE8 /* Pods_SocialMap.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EF51C191D6919509B2BDE004 /* Pods_SocialMap.framework */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		B3ED64692B8845C300D33579 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = B3ED64682B8845C300D33579 /* GoogleService-Info.plist */; };
 		C208129C6E16BEA117C5BEB5 /* Pods_SocialMap_SocialMapTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A49D0BC0CD694DAB9213A1C2 /* Pods_SocialMap_SocialMapTests.framework */; };
-		F7ABBD232B7AF7030096B084 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = F7ABBD222B7AF7030096B084 /* GoogleService-Info.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -43,9 +43,9 @@
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = SocialMap/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		89C6BE57DB24E9ADA2F236DE /* Pods-SocialMap-SocialMapTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SocialMap-SocialMapTests.release.xcconfig"; path = "Target Support Files/Pods-SocialMap-SocialMapTests/Pods-SocialMap-SocialMapTests.release.xcconfig"; sourceTree = "<group>"; };
 		A49D0BC0CD694DAB9213A1C2 /* Pods_SocialMap_SocialMapTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SocialMap_SocialMapTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B3ED64682B8845C300D33579 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		EF51C191D6919509B2BDE004 /* Pods_SocialMap.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SocialMap.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		F7ABBD222B7AF7030096B084 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "SocialMap/GoogleService-Info.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -118,7 +118,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
-				F7ABBD222B7AF7030096B084 /* GoogleService-Info.plist */,
+				B3ED64682B8845C300D33579 /* GoogleService-Info.plist */,
 				13B07FAE1A68108700A75B9A /* SocialMap */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* SocialMapTests */,
@@ -246,8 +246,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
+				B3ED64692B8845C300D33579 /* GoogleService-Info.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
-				F7ABBD232B7AF7030096B084 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -431,6 +431,7 @@
 			baseConfigurationReference = 5B7EB9410499542E8C5724F5 /* Pods-SocialMap-SocialMapTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				DEVELOPMENT_TEAM = 5WAH566W3B;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -459,6 +460,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
+				DEVELOPMENT_TEAM = 5WAH566W3B;
 				INFOPLIST_FILE = SocialMapTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
 				LD_RUNPATH_SEARCH_PATHS = (

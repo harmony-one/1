@@ -10,7 +10,7 @@ const CheckInButton = ({ isChecked, onPress, style }) => {
       style={[styles.button, style]}>
       <Icon
         name={isChecked ? "check-circle" : "check-circle-outline"}
-        size={24}
+        size={20}
         color={isChecked ? "green" : "grey"}
         style={styles.icon}
       />
@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   buttonText: {
-    fontSize: 16,
+    fontSize: 15,
   },
 });
 

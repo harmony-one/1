@@ -113,7 +113,7 @@ const MapViewComponent = () => {
   }, [markers]);
 
   const getMarkerAddress = async (latitude, longitude) => {
-    const apiKey = 'YOUR_API_KEY_HERE'; // Replace this with your actual API key
+    const apiKey = 'AIzaSyCKOFVj1ntVFg2nq_PSbnsetlbsKl8kC6g'; // 'YOUR_API_KEY_HERE'; // Replace this with your actual API key
     const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`;
 
     try {
@@ -164,10 +164,10 @@ const MapViewComponent = () => {
       const result = await speechToText(audioPath); // Assuming this function exists and works as expected
       if (result) {
         console.log('Transcription result:', result);
-        Toast.show({
-          type: 'success',
-          text1: result,
-        });
+        // Toast.show({
+        //   type: 'success',
+        //   text1: result,
+        // });
 
         Geolocation.getCurrentPosition(
           async (position) => { // Corrected syntax for async callback
@@ -387,7 +387,7 @@ const MapViewComponent = () => {
                         <TouchableOpacity onPress={() => openInAppBrowser(`https://www.j.country/tag/${sanitizeURL(marker.name)}`)}>
                           <Text style={styles.calloutTitle}>{marker.name}</Text>
                         </TouchableOpacity>
-                        <Text style={styles.calloutDescription}>{marker.address}</Text>
+                        <Text style={styles.calloutDescription}>{marker.address.split(',')[0]}</Text>
                         <View style={styles.buttonContainer}>
                           <CheckInButton
                             isChecked={!!checkedIn[marker.id]}
@@ -467,10 +467,12 @@ const MapViewComponent = () => {
           renderItem={({ item, index }) => (
 
             <View style={styles.carouselItemContainer}>
-              <Image source={require('../assets/photo.png')} style={styles.imageAction} />
+              <View style={styles.imageActionContainer}> 
+                <Image source={require('../assets/photo.png')}  borderRadius={15} style={styles.imageAction}/>
+              </View>
               <View style={styles.contentAction}>
-                <Text style={styles.textAction}>{item.memoTranscription || 'No memo transcription available'}</Text>
-                <Text style={styles.textAction}>{item.address || 'No address available'}</Text>
+                <Text style={styles.textAction}>{item.memoTranscription || 'No memo transcription available'}</Text> 
+                <Text style={styles.textActionAddress}>{item.address || 'No address available'}</Text>
               </View>
             </View>
           )}
@@ -498,6 +500,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between', // Space between the image and text content
     width: windowWidth, // Match the width of the carousel
     paddingHorizontal: 10, // Add some horizontal padding
+    height: 100
   },
 
 
@@ -511,8 +514,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     padding: 10,
     backgroundColor: '#404040',
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
+    // borderTopLeftRadius: 10,
+    // borderTopRightRadius: 10,
     // overflow: Platform.select({ android: 'hidden', ios: 'visible' }), // Example usage
   },
   // circle: {
@@ -532,19 +535,47 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 10,
   },
   contentAction: {
-    flex: 1,
+    flexGrow: 6,
+    flexDirection: 'column',
     color: 'white', // Ensure this contrasts with the background
     marginBottom: 8,
     marginLeft: 10,
+    height: 100,
+    width: 100
   },
   textAction: {
+    flexGrow: 1,
+    fontSize: 12,
+    paddingTop: 5,
+    paddingRight: 15,
+    paddingBottom: 5,
+    // Top: 5,
+    // paddingLeft: 5,x
+    textAlignVertical: 'center',
+    textAlign: 'left',
+    // marginBottom: 8, // Adjust based on your spacing needs
+    // marginLeft: 10, // Adjust the spacing between the text and the imag
+    color: 'white',
+    // width: 100
+  },
+  textActionAddress: {
+    // bottom: 3,
+    paddingRight: 25,
+    flexGrow: 0,
+    textAlign:'right',
+    textAlignVertical: 'bottom',
     fontSize: 12,
     marginBottom: 8, // Adjust based on your spacing needs
     marginLeft: 10, // Adjust the spacing between the text and the imag
     color: 'white',
-
   },
+  imageActionContainer: {
+    flexGrow: 0,
+  },
+
   imageAction: {
+    maxWidth: 95,
+    maxHeight: 95,
     width: 100, // Adjust based on your image size
     height: 100, // Adjust based on your image size
   },
@@ -553,17 +584,19 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   calloutView: {
+    padding: 8,
     width: 250,
     height: 'auto',
     borderRadius: 6,
   },
   calloutTitle: {
     fontWeight: 'bold',
-    fontSize: 24,
+    fontSize: 22,
     marginBottom: 5,
   },
   calloutDescription: {
-    fontSize: 18,
+    fontSize: 16,
+    marginBottom: 10,
   },
   buttonContainer: {
     flexDirection: 'row',
