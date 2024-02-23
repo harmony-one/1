@@ -10,6 +10,7 @@ export interface MapMarker {
   checked?: boolean;
   counter?: number;
   memoTranscription?: string;
+  image?: string;
 }
 export async function getMapMarkers(
   mapType = 'tf',

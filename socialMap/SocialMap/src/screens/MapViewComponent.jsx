@@ -28,6 +28,9 @@ import firestore from '@react-native-firebase/firestore';
 import CheckInButton from '../components/CheckInButton';
 import Carousel from 'react-native-reanimated-carousel';
 import uuid from 'react-native-uuid';
+import {launchCamera} from 'react-native-image-picker';
+import RNFS from 'react-native-fs';
+
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -188,7 +191,7 @@ const MapViewComponent = () => {
                 name: 'New Marker', // Changed from uuid to a descriptive name
                 longitude: longitude,
                 latitude: latitude,
-                address: address,
+                address: address.split(',')[0],
                 checked: true,
                 counter: 1,
                 memoTranscription: result
@@ -298,6 +301,50 @@ const MapViewComponent = () => {
     }));
   };
 
+  const openCameraAndSaveImage = id => {
+    const options = {
+      saveToPhotos: true,
+      mediaType: 'photo',
+    };
+    console.log('open Camera And SaveImage called');
+    launchCamera(options, async (response) => {
+      if (response.didCancel) {
+        console.log('User cancelled image capture');
+      } else if (response.error) {
+        console.log('ImagePicker Error: ', response.error);
+      } else if (response.customButton) {
+        console.log('User tapped custom button: ', response.customButton);
+      } else {
+        const source = {uri: response.assets[0].uri};
+        console.log('Image captured:', source.uri);
+  
+        // Save the image to the app's document directory
+        const timestamp = Date.now(); // Use a timestamp to ensure uniqueness
+        const newImageName = `image_${timestamp}.jpg`; // Generate a unique file name
+        const newImagePath = `${RNFS.DocumentDirectoryPath}/${newImageName}`;
+        try {
+          await RNFS.copyFile(source.uri, newImagePath);
+          console.log('Image saved to:', newImagePath);
+          // Here you can update your state or UI with the new image path
+          const updatedMarkers = markers.map(marker =>
+            marker.id === id
+              ? {
+                  ...marker,
+                  image: marker.image // Ensure the property name's case matches
+                    ? `${marker.image}\n${newImagePath}`
+                    : newImagePath,
+                }
+              : marker,
+          );
+          setMarkers(updatedMarkers);
+          
+        } catch (error) {
+          console.error('Error saving image:', error);
+        }
+      }
+    });
+  };
+
   const handleCheckIn = async (marker) => {
     const documentId = `${marker.longitude}${marker.latitude}`;
     const currentlyCheckedIn = !!checkedIn[marker.id];
@@ -389,13 +436,13 @@ const MapViewComponent = () => {
                         </TouchableOpacity>
                         <Text style={styles.calloutDescription}>{marker.address.split(',')[0]}</Text>
                         <View style={styles.buttonContainer}>
-                          <CheckInButton
+                          {/* <CheckInButton
                             isChecked={!!checkedIn[marker.id]}
                             onPress={() => {
                               toggleCheckIn(marker.id);
                               handleCheckIn(marker);
                             }}
-                          />
+                          /> */}
                           <TouchableOpacity
                             style={{ flexDirection: 'row', alignItems: 'center' }}
                             onPress={() => {
@@ -465,17 +512,24 @@ const MapViewComponent = () => {
             mapRef.current.animateToRegion(newRegion);
           }}
           renderItem={({ item, index }) => (
-
+            
             <View style={styles.carouselItemContainer}>
-              <View style={styles.imageActionContainer}> 
-                <Image source={require('../assets/photo.png')}  borderRadius={15} style={styles.imageAction}/>
+              <View style={styles.imageActionContainer}>
+                {/* Adjust the TouchableOpacity to call the function correctly */}
+                <TouchableOpacity onPress={() => openCameraAndSaveImage(item.id)}>
+                  <Image
+                    source={item.image ? { uri: item.image } : require('../assets/placeholder.png')}
+                    style={[styles.imageAction, { borderRadius: 15 }]}
+                  />
+                </TouchableOpacity>
               </View>
               <View style={styles.contentAction}>
-                <Text style={styles.textAction}>{item.memoTranscription || 'No memo transcription available'}</Text> 
+                <Text style={styles.textAction}>{item.memoTranscription || 'No memo transcription available'}</Text>
                 <Text style={styles.textActionAddress}>{item.address || 'No address available'}</Text>
               </View>
             </View>
           )}
+          
         />
       </View>
     </View>
@@ -599,8 +653,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  //  flexDirection: 'row',
+  //  justifyContent: 'space-between',
     alignItems: 'center',
   },
   locationButton: {

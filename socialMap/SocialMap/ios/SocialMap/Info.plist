@@ -59,5 +59,11 @@
 	<string>We need access to your location to show it on the map</string>
 	<key>CodePushDeploymentKey</key>
 <string>INSERT_YOUR_DEPLOYMENTKEY_HERE</string>
+<key>NSCameraUsageDescription</key>
+<string>Our application needs access to the camera to take photos.</string>
+<key>NSPhotoLibraryUsageDescription</key>
+<string>Our application needs access to the photo library to select images.</string>
+<key>NSPhotoLibraryAddUsageDescription</key>
+<string>Our application needs permission to save images to your photo library.</string>
 </dict>
 </plist>
