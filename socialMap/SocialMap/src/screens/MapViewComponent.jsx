@@ -11,7 +11,8 @@ import {
   Alert,
   CheckmarkBox,
   GestureResponderHandlers,
-  Image
+  Image,
+  Animated
 
 } from 'react-native';
 import MapView, { Marker, Callout } from 'react-native-maps';
@@ -28,7 +29,7 @@ import firestore from '@react-native-firebase/firestore';
 import CheckInButton from '../components/CheckInButton';
 import Carousel from 'react-native-reanimated-carousel';
 import uuid from 'react-native-uuid';
-import {launchCamera} from 'react-native-image-picker';
+import { launchCamera } from 'react-native-image-picker';
 import RNFS from 'react-native-fs';
 
 
@@ -50,6 +51,8 @@ const MapViewComponent = () => {
   const actionSheetRef = useRef(null);
   const actionSheetContainerRef = useRef(null);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const opacity = useRef(new Animated.Value(1)).current; // For opacity animation
+
 
   useEffect(() => {
     const getMarkers = async () => {
@@ -114,6 +117,34 @@ const MapViewComponent = () => {
 
     fetchCounts();
   }, [markers]);
+
+  // Animation for blinking effect
+  useEffect(() => {
+    const blinkAnimation = Animated.loop(
+      Animated.sequence([
+        Animated.timing(opacity, {
+          toValue: 0,
+          duration: 500, // Adjust the speed of blinking
+          useNativeDriver: true,
+        }),
+        Animated.timing(opacity, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+      ])
+    );
+
+    if (isRecording) {
+      blinkAnimation.start(); // Start blinking when recording
+    } else {
+      blinkAnimation.stop(); // Stop blinking when not recording
+      opacity.setValue(1); // Reset opacity to show button normally
+    }
+
+    return () => blinkAnimation.stop(); // Cleanup by stopping the animation
+  }, [isRecording]);
+
 
   const getMarkerAddress = async (latitude, longitude) => {
     const apiKey = 'AIzaSyCKOFVj1ntVFg2nq_PSbnsetlbsKl8kC6g'; // 'YOUR_API_KEY_HERE'; // Replace this with your actual API key
@@ -233,10 +264,6 @@ const MapViewComponent = () => {
       const result = await speechToText(audioPath);
       if (result) {
         console.log('Transcription result:', result);
-        Toast.show({
-          type: 'success',
-          text1: result,
-        });
         const updatedMarkers = markers.map(marker =>
           marker.id === id
             ? {
@@ -315,9 +342,9 @@ const MapViewComponent = () => {
       } else if (response.customButton) {
         console.log('User tapped custom button: ', response.customButton);
       } else {
-        const source = {uri: response.assets[0].uri};
+        const source = { uri: response.assets[0].uri };
         console.log('Image captured:', source.uri);
-  
+
         // Save the image to the app's document directory
         const timestamp = Date.now(); // Use a timestamp to ensure uniqueness
         const newImageName = `image_${timestamp}.jpg`; // Generate a unique file name
@@ -329,15 +356,15 @@ const MapViewComponent = () => {
           const updatedMarkers = markers.map(marker =>
             marker.id === id
               ? {
-                  ...marker,
-                  image: marker.image // Ensure the property name's case matches
-                    ? `${marker.image}\n${newImagePath}`
-                    : newImagePath,
-                }
+                ...marker,
+                image: marker.image // Ensure the property name's case matches
+                  ? `${marker.image}\n${newImagePath}`
+                  : newImagePath,
+              }
               : marker,
           );
           setMarkers(updatedMarkers);
-          
+
         } catch (error) {
           console.error('Error saving image:', error);
         }
@@ -452,7 +479,9 @@ const MapViewComponent = () => {
                                 startRecordingEventPopup(marker);
                               }
                             }}>
-                            <Icon name={isRecording ? "mic" : "mic-none"} size={30} color={isRecording ? "red" : "#00ace8"} />
+                            <Animated.View style={{ opacity }}>
+                              <Icon name={isRecording ? "mic" : "mic-none"} size={30} color={isRecording ? "red" : "#00ace8"} />
+                            </Animated.View>
                           </TouchableOpacity>
                         </View>
                       </View>
@@ -479,7 +508,9 @@ const MapViewComponent = () => {
                     startRecording();
                   }
                 }}>
+                   <Animated.View style={{ opacity }}>
                   <Icon name={isRecording ? "mic" : "mic-none"} size={25} color={isRecording ? "red" : "#00ace8"} />
+                  </Animated.View>
                 </TouchableOpacity>
               </View>
             </View>
@@ -512,7 +543,7 @@ const MapViewComponent = () => {
             mapRef.current.animateToRegion(newRegion);
           }}
           renderItem={({ item, index }) => (
-            
+
             <View style={styles.carouselItemContainer}>
               <View style={styles.imageActionContainer}>
                 {/* Adjust the TouchableOpacity to call the function correctly */}
@@ -529,7 +560,7 @@ const MapViewComponent = () => {
               </View>
             </View>
           )}
-          
+
         />
       </View>
     </View>
@@ -616,7 +647,7 @@ const styles = StyleSheet.create({
     // bottom: 3,
     paddingRight: 25,
     flexGrow: 0,
-    textAlign:'right',
+    textAlign: 'right',
     textAlignVertical: 'bottom',
     fontSize: 12,
     marginBottom: 8, // Adjust based on your spacing needs
@@ -653,8 +684,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   buttonContainer: {
-  //  flexDirection: 'row',
-  //  justifyContent: 'space-between',
+    //  flexDirection: 'row',
+    //  justifyContent: 'space-between',
     alignItems: 'center',
   },
   locationButton: {
