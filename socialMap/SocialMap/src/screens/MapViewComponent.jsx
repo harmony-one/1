@@ -52,7 +52,7 @@ const MapViewComponent = () => {
   const actionSheetContainerRef = useRef(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const opacity = useRef(new Animated.Value(1)).current; // For opacity animation
-
+  const carouselRef = useRef(null);
 
   useEffect(() => {
     const getMarkers = async () => {
@@ -75,6 +75,16 @@ const MapViewComponent = () => {
       }
     });
   }, []);
+
+  useEffect(() => {
+    const updatedCount = markers.length;
+    const latestData = markers[updatedCount - 1];
+  
+    console.log("Updated markers count:", updatedCount);
+    console.log("Latest marker data:", latestData);
+    // Perform actions with the updated count and latest data here
+  
+  }, [markers]); // This
 
   useEffect(() => {
     if (mapRef.current) {
@@ -124,12 +134,12 @@ const MapViewComponent = () => {
       Animated.sequence([
         Animated.timing(opacity, {
           toValue: 0,
-          duration: 500, // Adjust the speed of blinking
+          duration: 1000, // Adjust the speed of blinking
           useNativeDriver: true,
         }),
         Animated.timing(opacity, {
           toValue: 1,
-          duration: 500,
+          duration: 1000,
           useNativeDriver: true,
         }),
       ])
@@ -230,6 +240,9 @@ const MapViewComponent = () => {
 
               setMarkers(prevMarkers => [...prevMarkers, newMarker]);
               mapRef.current.animateToRegion(newRegion, 1000); // Added duration for animation
+              setTimeout(() => {
+                carouselRef.current?.scrollTo({ index: markers.length, animated: true })
+              }, 1000); // Adjust the delay as needed
             }
           },
           error => {
@@ -402,7 +415,8 @@ const MapViewComponent = () => {
 
   const getCurrentLocation = () => {
     console.log('Attempting to get current position...');
-    Geolocation.getCurrentPosition(
+
+      Geolocation.getCurrentPosition(
       position => {
         console.log('Current position:', position);
         const { latitude, longitude } = position.coords;
@@ -526,12 +540,15 @@ const MapViewComponent = () => {
       <View style={styles.containerActionBottom}>
         <Carousel
           //loop
+          ref={carouselRef}
+          key={markers.length}
           width={windowWidth - 10} // Use the width of the window/device
           height={100} // Fixed height for each item
           data={markers}
           layout={'default'} // Use 'default' or other layouts as needed
+          autoPlayInterval={1}
           onSnapToItem={index => {
-            console.log("New Index:", index); // Debugging log
+            console.log("New Index:", index); //r Debugging log
             setCurrentIndex(index);
 
             const newRegion = {
