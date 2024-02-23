@@ -570,12 +570,12 @@ const styles = StyleSheet.create({
     color: 'white',
   },
   imageActionContainer: {
-    flexGrow: 1,
+    flexGrow: 0,
   },
 
   imageAction: {
-    maxWidth: 85,
-    maxHeight: 85,
+    maxWidth: 95,
+    maxHeight: 95,
     width: 100, // Adjust based on your image size
     height: 100, // Adjust based on your image size
   },
