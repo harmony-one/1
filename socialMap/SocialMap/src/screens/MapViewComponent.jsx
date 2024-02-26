@@ -157,7 +157,7 @@ const MapViewComponent = () => {
 
 
   const getMarkerAddress = async (latitude, longitude) => {
-    const apiKey = 'AIzaSyCKOFVj1ntVFg2nq_PSbnsetlbsKl8kC6g'; // 'YOUR_API_KEY_HERE'; // Replace this with your actual API key
+    const apiKey = 'YOUR_API_KEY_HERE'; // 'YOUR_API_KEY_HERE'; // Replace this with your actual API key
     const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`;
 
     try {
