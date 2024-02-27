@@ -31,7 +31,7 @@ import Carousel from 'react-native-reanimated-carousel';
 import uuid from 'react-native-uuid';
 import { launchCamera } from 'react-native-image-picker';
 import RNFS from 'react-native-fs';
-
+import config from '../config';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -157,7 +157,9 @@ const MapViewComponent = () => {
 
 
   const getMarkerAddress = async (latitude, longitude) => {
-    const apiKey = 'YOUR_API_KEY_HERE'; // 'YOUR_API_KEY_HERE'; // Replace this with your actual API key
+    const apiKey = config.googleMap_api_key
+    console.log('apiKey API error:', apiKey);
+
     const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`;
 
     try {
@@ -228,7 +230,8 @@ const MapViewComponent = () => {
             if (address) {
               console.log('Current address:', address);
               const newMarker = {
-                id: uuid.v4(), // Ensure uuid.v4() is correctly imported and used
+            //    id: uuid.v4(), // Ensure uuid.v4() is correctly imported and used
+                id: markers.length + 1,
                 name: 'New Marker', // Changed from uuid to a descriptive name
                 longitude: longitude,
                 latitude: latitude,
@@ -470,6 +473,10 @@ const MapViewComponent = () => {
                     }}
                     title={marker.name}
                     description={marker.address}>
+                      <View style={styles.circle}>
+              {/* change "1" to reflect count for number of checkins */}
+              <Text style={styles.number}>{marker.id}</Text>
+            </View>
                     <Callout onPress={() => handlePress(marker)}>
                       <View style={styles.calloutView}>
                         <TouchableOpacity onPress={() => openInAppBrowser(`https://www.j.country/tag/${sanitizeURL(marker.name)}`)}>
@@ -620,14 +627,14 @@ const styles = StyleSheet.create({
     // borderTopRightRadius: 10,
     // overflow: Platform.select({ android: 'hidden', ios: 'visible' }), // Example usage
   },
-  // circle: {
-  //   width: 40,
-  //   height: 40,
-  //   borderRadius: 30,
-  //   backgroundColor: '#00ace8',
-  //   justifyContent: 'center',
-  //   alignItems: 'center',
-  // },
+  circle: {
+    width: 40,
+    height: 40,
+    borderRadius: 30,
+    backgroundColor: '#00ace8',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   containerAction: {
     flexDirection: 'row',
     padding: 10,
@@ -678,8 +685,8 @@ const styles = StyleSheet.create({
   imageAction: {
     maxWidth: 95,
     maxHeight: 95,
-    width: 100, // Adjust based on your image size
-    height: 100, // Adjust based on your image size
+    width: 0, // Adjust based on your image size
+    height: 0, // Adjust based on your image size
   },
   number: {
     color: 'white',
