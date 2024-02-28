@@ -23,6 +23,7 @@ DerivedData
 ios/.xcode.env.local
 .env
 ios/SocialMap/GoogleService-Info.plist
+ios/GoogleService-Info.plist
 # Android/IntelliJ
 #
 build/
