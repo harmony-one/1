@@ -54,7 +54,7 @@ const MapViewComponent = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const opacity = useRef(new Animated.Value(1)).current; // For opacity animation
   const carouselRef = useRef(null);
-  const {wallet} = useUserContext()
+  const {wallet, getAddressShort} = useUserContext()
   useEffect(() => {
     const getMarkers = async () => {
       const markers = await getMapMarkers();
@@ -63,6 +63,7 @@ const MapViewComponent = () => {
     getMarkers();
   }, []);
   console.log(wallet)
+  console.log(getAddressShort())
   useEffect(() => {
     AudioRecorder.requestAuthorization().then(isAuthorised => {
       setHasPermission(isAuthorised);

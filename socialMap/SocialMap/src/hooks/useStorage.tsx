@@ -1,4 +1,5 @@
 import {useEffect, useState} from 'react';
+import {getUniqueId} from 'react-native-device-info';
 import {MMKV} from 'react-native-mmkv';
 
 type Storage = MMKV | null;
@@ -14,8 +15,7 @@ const useStorage = (): StorageType => {
 
   useEffect(() => {
     const initializeMMKV = async () => {
-      const userId = '12345';
-
+      const userId = (await getUniqueId()) || '';
       const mmkvInstance = new MMKV({
         id: `${userId}-storage`,
         path: 'one-map-storage/storage',

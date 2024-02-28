@@ -5,7 +5,6 @@ import React, {
   SetStateAction,
   useContext,
   useEffect,
-  useMemo,
   useState,
 } from 'react';
 import 'react-native-get-random-values';
@@ -17,6 +16,7 @@ export const LSAccountKey = 'one_map_client_account';
 
 interface UserContextType {
   wallet: Wallet | undefined;
+  getAddressShort: () => string;
   setWallet: Dispatch<SetStateAction<Wallet | undefined>>;
 }
 
@@ -57,10 +57,15 @@ const UserProvider: React.FC<UserProviderProps> = ({children}) => {
     }
   }, [privateKeyLS, setValue, wallet]);
 
-  const value = useMemo<UserContextType>(
-    () => ({wallet, setWallet}),
-    [wallet, setWallet],
-  );
+  const getAddressShort = () => {
+    return wallet ? wallet.address.substring(2, 6) : '';
+  };
+
+  const value = {
+    wallet,
+    getAddressShort,
+    setWallet,
+  };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 };
