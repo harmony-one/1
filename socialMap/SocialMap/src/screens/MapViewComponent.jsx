@@ -32,6 +32,7 @@ import uuid from 'react-native-uuid';
 import { launchCamera } from 'react-native-image-picker';
 import RNFS from 'react-native-fs';
 import config from '../config';
+import { useUserContext } from '../context/UserContext';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -53,7 +54,7 @@ const MapViewComponent = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const opacity = useRef(new Animated.Value(1)).current; // For opacity animation
   const carouselRef = useRef(null);
-
+  const {wallet} = useUserContext()
   useEffect(() => {
     const getMarkers = async () => {
       const markers = await getMapMarkers();
@@ -61,7 +62,7 @@ const MapViewComponent = () => {
     };
     getMarkers();
   }, []);
-
+  console.log(wallet)
   useEffect(() => {
     AudioRecorder.requestAuthorization().then(isAuthorised => {
       setHasPermission(isAuthorised);
