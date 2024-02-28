@@ -4,11 +4,14 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import MapViewComponent from './src/screens/MapViewComponent';
 import React from 'react';
-import codePush from 'react-native-code-push'
-
+import codePush from 'react-native-code-push';
+import {UserProvider} from './src/context/UserContext';
 
 const Stack = createStackNavigator();
-let codePushOptions = { checkFrequency: codePush.CheckFrequency.ON_APP_RESUME, installMode: codePush.InstallMode.ON_NEXT_RESUME };
+let codePushOptions = {
+  checkFrequency: codePush.CheckFrequency.ON_APP_RESUME,
+  installMode: codePush.InstallMode.ON_NEXT_RESUME,
+};
 
 function MyStack() {
   return (
@@ -23,14 +26,14 @@ function MyStack() {
   );
 }
 
- function App() {
+function App() {
   return (
-    <>
+    <UserProvider>
       <NavigationContainer>
         <MyStack />
       </NavigationContainer>
       <Toast />
-    </>
+    </UserProvider>
   );
 }
 
