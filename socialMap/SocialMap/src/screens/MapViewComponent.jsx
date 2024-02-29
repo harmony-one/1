@@ -55,6 +55,7 @@ const MapViewComponent = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const opacity = useRef(new Animated.Value(1)).current; // For opacity animation
   const carouselRef = useRef(null);
+  const carouselRefImages = useRef(null);
   const { wallet, getAddressShort } = useUserContext()
   useEffect(() => {
     const getMarkers = async () => {
@@ -559,7 +560,7 @@ const MapViewComponent = () => {
       <View style={styles.carouselImages}>
         <Carousel
           //loop
-          ref={carouselRef}
+          ref={carouselRefImages}
           key={markers.length}
           width={windowWidth - 10} // Use the width of the window/device
           height={150} // Fixed height for each item
@@ -615,7 +616,7 @@ const MapViewComponent = () => {
               longitudeDelta: 0.01,
             };
             mapRef.current.animateToRegion(newRegion);
-            carouselRef.current?.scrollTo({ index: index, animated: true })
+            carouselRefImages.current?.scrollTo({ index: index, animated: true })
             
           }}
           renderItem={({ item, index }) => (
