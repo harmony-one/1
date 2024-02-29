@@ -33,6 +33,7 @@ import { launchCamera } from 'react-native-image-picker';
 import RNFS from 'react-native-fs';
 import config from '../config';
 import { useUserContext } from '../context/UserContext';
+import LinearGradient from 'react-native-linear-gradient';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -54,7 +55,7 @@ const MapViewComponent = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const opacity = useRef(new Animated.Value(1)).current; // For opacity animation
   const carouselRef = useRef(null);
-  const {wallet, getAddressShort} = useUserContext()
+  const { wallet, getAddressShort } = useUserContext()
   useEffect(() => {
     const getMarkers = async () => {
       const markers = await getMapMarkers();
@@ -81,11 +82,11 @@ const MapViewComponent = () => {
   useEffect(() => {
     const updatedCount = markers.length;
     const latestData = markers[updatedCount - 1];
-  
+
     console.log("Updated markers count:", updatedCount);
     console.log("Latest marker data:", latestData);
     // Perform actions with the updated count and latest data here
-  
+
   }, [markers]); // This
 
   useEffect(() => {
@@ -232,7 +233,7 @@ const MapViewComponent = () => {
             if (address) {
               console.log('Current address:', address);
               const newMarker = {
-            //    id: uuid.v4(), // Ensure uuid.v4() is correctly imported and used
+                //    id: uuid.v4(), // Ensure uuid.v4() is correctly imported and used
                 id: markers.length + 1,
                 name: 'New Marker', // Changed from uuid to a descriptive name
                 longitude: longitude,
@@ -421,7 +422,7 @@ const MapViewComponent = () => {
   const getCurrentLocation = () => {
     console.log('Attempting to get current position...');
 
-      Geolocation.getCurrentPosition(
+    Geolocation.getCurrentPosition(
       position => {
         console.log('Current position:', position);
         const { latitude, longitude } = position.coords;
@@ -431,7 +432,7 @@ const MapViewComponent = () => {
           latitudeDelta: 0.01, // Optionally adjust the latitudeDelta and longitudeDelta
           longitudeDelta: 0.01,
         };
-        mapRef.current.animateToRegion(newRegion);
+        mapRef.current.animateToRegion(newRegion);        
       },
       error => {
         console.error('Error getting current position:', error);
@@ -458,6 +459,7 @@ const MapViewComponent = () => {
             <MapView
               ref={mapRef}
               style={styles.map}
+              mode = 'dark'
               initialRegion={{
                 latitude: 39.739235,
                 longitude: -104.99025,
@@ -475,10 +477,17 @@ const MapViewComponent = () => {
                     }}
                     title={marker.name}
                     description={marker.address}>
-                      <View style={styles.circle}>
-              {/* change "1" to reflect count for number of checkins */}
-              <Text style={styles.number}>{marker.id}</Text>
-            </View>
+                    <View style={styles.circle}>
+                      <LinearGradient
+                        colors={['#00AEE9', '#FFFFFF']} // Replace with your gradient colors
+                        style={styles.circle}
+                        start={{ x: 0, y: 0 }} // Gradient starting position
+                        end={{ x: 1, y: 1 }} // Gradient ending position
+                      >
+                        <Text style={styles.number}>{marker.id}</Text>
+                      </LinearGradient>
+
+                    </View>
                     <Callout onPress={() => handlePress(marker)}>
                       <View style={styles.calloutView}>
                         <TouchableOpacity onPress={() => openInAppBrowser(`https://www.j.country/tag/${sanitizeURL(marker.name)}`)}>
@@ -493,6 +502,7 @@ const MapViewComponent = () => {
                               handleCheckIn(marker);
                             }}
                           /> */}
+                          
                           <TouchableOpacity
                             style={{ flexDirection: 'row', alignItems: 'center' }}
                             onPress={() => {
@@ -531,8 +541,8 @@ const MapViewComponent = () => {
                     startRecording();
                   }
                 }}>
-                   <Animated.View style={{ opacity }}>
-                  <Icon name={isRecording ? "mic" : "mic-none"} size={25} color={isRecording ? "red" : "#00ace8"} />
+                  <Animated.View style={{ opacity }}>
+                    <Icon name={isRecording ? "mic" : "mic-none"} size={25} color={isRecording ? "red" : "#00ace8"} />
                   </Animated.View>
                 </TouchableOpacity>
               </View>
@@ -546,15 +556,53 @@ const MapViewComponent = () => {
         )}
       </View>
 
+      <View style={styles.carouselImages}>
+        <Carousel
+          //loop
+          ref={carouselRef}
+          key={markers.length}
+          width={windowWidth - 10} // Use the width of the window/device
+          height={150} // Fixed height for each item
+          data={markers}
+          mode="parallax"
+          modeConfig={{
+            parallaxScrollingScale: 0.9,
+            parallaxScrollingOffset: 180,
+            parallaxAdjacentItemScale: 0.8,
+          }}
+          onSnapToItem={index => {
+            console.log("New Index:", index); //r Debugging log
+            setCurrentIndex(index);
+            const newRegion = {
+              latitude: markers[index].latitude,
+              longitude: markers[index].longitude,
+              latitudeDelta: 0.01,
+              longitudeDelta: 0.01,
+            };
+            mapRef.current.animateToRegion(newRegion);
+            carouselRef.current?.scrollTo({ index: index, animated: true })
+
+          }}
+          renderItem={({ item, index }) => (
+            <TouchableOpacity onPress={() => openCameraAndSaveImage(item.id)}>
+              <Image
+                source={item.image ? { uri: item.image } : require('../assets/group.png')}
+                style={[styles.imageAction, { borderRadius: 15 }]}
+              />
+            </TouchableOpacity>
+          )}
+        />
+      </View>
+
       <View style={styles.containerActionBottom}>
         <Carousel
           //loop
           ref={carouselRef}
           key={markers.length}
           width={windowWidth - 10} // Use the width of the window/device
-          height={100} // Fixed height for each item
+          height={120} // Fixed height for each item
           data={markers}
-          layout={'default'} // Use 'default' or other layouts as needed
+          // layout={'default'} // Use 'default' or other layouts as needed
           autoPlayInterval={1}
           onSnapToItem={index => {
             console.log("New Index:", index); //r Debugging log
@@ -567,26 +615,17 @@ const MapViewComponent = () => {
               longitudeDelta: 0.01,
             };
             mapRef.current.animateToRegion(newRegion);
+            carouselRef.current?.scrollTo({ index: index, animated: true })
+            
           }}
           renderItem={({ item, index }) => (
-
             <View style={styles.carouselItemContainer}>
-              <View style={styles.imageActionContainer}>
-                {/* Adjust the TouchableOpacity to call the function correctly */}
-                <TouchableOpacity onPress={() => openCameraAndSaveImage(item.id)}>
-                  <Image
-                    source={item.image ? { uri: item.image } : require('../assets/placeholder.png')}
-                    style={[styles.imageAction, { borderRadius: 15 }]}
-                  />
-                </TouchableOpacity>
-              </View>
               <View style={styles.contentAction}>
                 <Text style={styles.textAction}>{item.memoTranscription || 'No memo transcription available'}</Text>
-                <Text style={styles.textActionAddress}>{item.address || 'No address available'}</Text>
+                <Text style={styles.textActionAddress}>{'#' + index + 1 + ' ' + getAddressShort() + ' @' + item.address || 'No address available'}</Text>
               </View>
             </View>
           )}
-
         />
       </View>
     </View>
@@ -604,7 +643,6 @@ const styles = StyleSheet.create({
   map: {
     ...StyleSheet.absoluteFillObject, // This will make the map fill the mapContainer
   },
-
   carouselItemContainer: {
     flexDirection: 'row', // Align items horizontally
     alignItems: 'center', // Center items vertically in the container
@@ -613,8 +651,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10, // Add some horizontal padding
     height: 100
   },
-
-
   overlayButtons: {
     position: 'absolute', // Position buttons over the map
     bottom: 10, // Adjust based on your layout
@@ -625,9 +661,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     padding: 10,
     backgroundColor: '#404040',
-    // borderTopLeftRadius: 10,
-    // borderTopRightRadius: 10,
-    // overflow: Platform.select({ android: 'hidden', ios: 'visible' }), // Example usage
+  },
+  carouselImages: {
+    backgroundColor: 'transparent', // Completely transparent background
+    justifyContent: 'center',
   },
   circle: {
     width: 40,
@@ -641,7 +678,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     padding: 10,
     alignItems: 'center',
-    //  backgroundColor: '#404040',
     borderTopLeftRadius: 10, // Adjust the radius as needed
     borderTopRightRadius: 10,
   },
@@ -660,17 +696,11 @@ const styles = StyleSheet.create({
     paddingTop: 5,
     paddingRight: 15,
     paddingBottom: 5,
-    // Top: 5,
-    // paddingLeft: 5,x
     textAlignVertical: 'center',
     textAlign: 'left',
-    // marginBottom: 8, // Adjust based on your spacing needs
-    // marginLeft: 10, // Adjust the spacing between the text and the imag
     color: 'white',
-    // width: 100
   },
   textActionAddress: {
-    // bottom: 3,
     paddingRight: 25,
     flexGrow: 0,
     textAlign: 'right',
@@ -680,15 +710,14 @@ const styles = StyleSheet.create({
     marginLeft: 10, // Adjust the spacing between the text and the imag
     color: 'white',
   },
-  imageActionContainer: {
-    flexGrow: 0,
-  },
-
   imageAction: {
-    maxWidth: 95,
-    maxHeight: 95,
-    width: 0, // Adjust based on your image size
-    height: 0, // Adjust based on your image size
+    maxWidth: 300,
+    maxHeight: 150,
+    width: 292, // Adjust based on your image size
+    height: 150, // Adjust based on your image size
+    backgroundColor: 'transparent', // Completely transparent background
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   number: {
     color: 'white',
