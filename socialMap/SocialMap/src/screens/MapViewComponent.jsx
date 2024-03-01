@@ -36,6 +36,7 @@ import { useUserContext } from '../context/UserContext';
 import LinearGradient from 'react-native-linear-gradient';
 import MapMarker from '../components/map-marker/MapMarkerComponent';
 import { styles } from './MapView.styles';
+import { getMarkerAddress } from '../apis/geocoding';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -66,8 +67,6 @@ const MapViewComponent = () => {
     };
     getMarkers();
   }, []);
-  // console.log(wallet)
-  // console.log(getAddressShort())
   useEffect(() => {
     AudioRecorder.requestAuthorization().then(isAuthorised => {
       setHasPermission(isAuthorised);
@@ -85,11 +84,6 @@ const MapViewComponent = () => {
   useEffect(() => {
     const updatedCount = markers.length;
     const latestData = markers[updatedCount - 1];
-
-    // console.log("Updated markers count:", updatedCount);
-    // console.log("Latest marker data:", latestData);
-    // Perform actions with the updated count and latest data here
-
   }, [markers]); // This
 
   useEffect(() => {
@@ -157,34 +151,8 @@ const MapViewComponent = () => {
       blinkAnimation.stop(); // Stop blinking when not recording
       opacity.setValue(1); // Reset opacity to show button normally
     }
-
     return () => blinkAnimation.stop(); // Cleanup by stopping the animation
   }, [isRecording]);
-
-
-  const getMarkerAddress = async (latitude, longitude) => {
-    const apiKey = config.googleMap_api_key
-    console.log('apiKey API error:', apiKey);
-
-    const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`;
-
-    try {
-      const response = await fetch(url);
-      const json = await response.json();
-
-      if (json.status === 'OK') {
-        // Extract the full address from the first result
-        const address = json.results[0]?.formatted_address;
-        return address;
-      } else {
-        console.log('Geocoding API error:', json.status);
-        return null;
-      }
-    } catch (error) {
-      console.error('Failed to fetch address:', error);
-      return null;
-    }
-  };
 
   // Handle recording start
   const startRecording = async () => {
@@ -216,11 +184,6 @@ const MapViewComponent = () => {
       const result = await speechToText(audioPath); // Assuming this function exists and works as expected
       if (result) {
         console.log('Transcription result:', result);
-        // Toast.show({
-        //   type: 'success',
-        //   text1: result,
-        // });
-
         Geolocation.getCurrentPosition(
           async (position) => { // Corrected syntax for async callback
             console.log('Current position:', position);
@@ -332,7 +295,7 @@ const MapViewComponent = () => {
           latitudeDelta: 0.01, // Optionally adjust the latitudeDelta and longitudeDelta
           longitudeDelta: 0.01,
         };
-        mapRef.current.animateToRegion(newRegion);        
+        mapRef.current.animateToRegion(newRegion);
       },
       error => {
         console.error('Error getting current position:', error);
@@ -340,6 +303,28 @@ const MapViewComponent = () => {
       },
       { enableHighAccuracy: true },
     );
+  };
+
+  const synchronizeMapAndCarousel = (index, carouselRef) => {
+    if (index < 0 || index >= markers.length) {
+      console.warn('Index out of bounds. Cannot synchronize map and carousel.');
+      return;
+    }
+
+    // Define the new region for the map based on the marker's location
+    const newRegion = {
+      latitude: markers[index].latitude,
+      longitude: markers[index].longitude,
+      latitudeDelta: 0.01,
+      longitudeDelta: 0.01,
+    };
+
+    // Animate the map to the new region
+    mapRef.current.animateToRegion(newRegion);
+
+    // Scroll the carousel to the new index, using the passed carousel reference
+    carouselRef.current?.scrollTo({ index: index, animated: true });
+
   };
 
   return (
@@ -350,7 +335,6 @@ const MapViewComponent = () => {
             <MapView
               ref={mapRef}
               style={styles.map}
-              mode = 'dark'
               initialRegion={{
                 latitude: 39.739235,
                 longitude: -104.99025,
@@ -360,15 +344,15 @@ const MapViewComponent = () => {
               {markers.length > 0 &&
                 markers.map((marker, index) => (
                   <MapMarker
-                  key={index}
-                  marker={marker}
-                  isRecording={isRecording}
-                  setIsRecording={setIsRecording}
-                  setMarkers={setMarkers}
-                  mapRef={mapRef}
-                  hasPermission={hasPermission}
-                  currentIndex={currentIndex}
-                />
+                    key={index}
+                    marker={marker}
+                    isRecording={isRecording}
+                    setIsRecording={setIsRecording}
+                    setMarkers={setMarkers}
+                    mapRef={mapRef}
+                    hasPermission={hasPermission}
+                    currentIndex={currentIndex}
+                  />
                 ))}
             </MapView>
             <View style={styles.overlayButtons}>
@@ -415,20 +399,20 @@ const MapViewComponent = () => {
           data={markers}
           mode="parallax"
           modeConfig={{
-            parallaxScrollingScale: 0.9,
+            parallaxScrollingScale: 1,
             parallaxScrollingOffset: 180,
             parallaxAdjacentItemScale: 0.8,
           }}
           onSnapToItem={index => {
-            console.log("New Index:", index); //r Debugging log
+            console.log("New Index: carouselImages", index); //r Debugging log
             setCurrentIndex(index);
-            carouselRef.current?.scrollTo({ index: index, animated: true })
+            synchronizeMapAndCarousel(index, carouselRef);
           }}
           renderItem={({ item, index }) => (
             <TouchableOpacity onPress={() => openCameraAndSaveImage(item.id)}>
               <Image
                 source={item.image ? { uri: item.image } : require('../assets/group.png')}
-                style={[styles.imageAction, { borderRadius: 15 }]}
+                style={[styles.imageAction, { borderRadrius: 15 }]}
               />
             </TouchableOpacity>
           )}
@@ -443,19 +427,16 @@ const MapViewComponent = () => {
           width={windowWidth - 10} // Use the width of the window/device
           height={120} // Fixed height for each item
           data={markers}
-          // layout={'default'} // Use 'default' or other layouts as needed
-          autoPlayInterval={1}
           onSnapToItem={index => {
-            console.log("New Index:", index); //r Debugging log
-            setCurrentIndex(index);
-            carouselRefImages.current?.scrollTo({ index: index, animated: true })
-            
+            console.log("New Index: containerActionBottom", index); //r Debugging log
+            synchronizeMapAndCarousel(index, carouselRef);
+
           }}
           renderItem={({ item, index }) => (
             <View style={styles.carouselItemContainer}>
               <View style={styles.contentAction}>
                 <Text style={styles.textAction}>{item.memoTranscription || 'No memo transcription available'}</Text>
-                <Text style={styles.textActionAddress}>{'#' + index + 1 + ' ' + getAddressShort() + ' @' + item.address || 'No address available'}</Text>
+                <Text style={styles.textActionAddress}>{'#' + index == 0 ? 1 : index + 1 + ' ' + getAddressShort() + ' @' + item.address || 'No address available'}</Text>
               </View>
             </View>
           )}
