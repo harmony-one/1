@@ -34,6 +34,8 @@ import RNFS from 'react-native-fs';
 import config from '../config';
 import { useUserContext } from '../context/UserContext';
 import LinearGradient from 'react-native-linear-gradient';
+import MapMarker from '../components/map-marker/MapMarkerComponent';
+import { styles } from './MapView.styles';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -64,8 +66,8 @@ const MapViewComponent = () => {
     };
     getMarkers();
   }, []);
-  console.log(wallet)
-  console.log(getAddressShort())
+  // console.log(wallet)
+  // console.log(getAddressShort())
   useEffect(() => {
     AudioRecorder.requestAuthorization().then(isAuthorised => {
       setHasPermission(isAuthorised);
@@ -84,8 +86,8 @@ const MapViewComponent = () => {
     const updatedCount = markers.length;
     const latestData = markers[updatedCount - 1];
 
-    console.log("Updated markers count:", updatedCount);
-    console.log("Latest marker data:", latestData);
+    // console.log("Updated markers count:", updatedCount);
+    // console.log("Latest marker data:", latestData);
     // Perform actions with the updated count and latest data here
 
   }, [markers]); // This
@@ -273,81 +275,6 @@ const MapViewComponent = () => {
     }
   };
 
-  // Handle recording stop and playback
-  const stopRecordingAndPlayBackEventPopup = async id => {
-    if (!isRecording) return;
-    await AudioRecorder.stopRecording();
-    setIsRecording(false);
-    // Playback the recording
-    try {
-      console.log(audioPath);
-      const result = await speechToText(audioPath);
-      if (result) {
-        console.log('Transcription result:', result);
-        const updatedMarkers = markers.map(marker =>
-          marker.id === id
-            ? {
-              ...marker,
-              memoTranscription: marker.memoTranscription
-                ? `${marker.memoTranscription}\n${result}`
-                : result,
-            }
-            : marker,
-        );
-        setMarkers(updatedMarkers);
-        console.log('Current data store in array', markers);
-      } else {
-        Toast.show({
-          type: 'error',
-          text1: 'The voice memo could not be processed',
-        });
-      }
-    } catch (error) {
-      console.error('Error processing audio:', error);
-    }
-  };
-
-  // Handle recording start
-  const startRecordingEventPopup = async marker => {
-    if (!hasPermission) {
-      console.warn("Can't record, no permission granted!");
-      return;
-    }
-    setIsRecording(true);
-    if (hasTranscription(markers)) {
-      const audio =
-        AudioUtils.DocumentDirectoryPath + `/voiceMemo_${Date.now()}.mp4`;
-      setAudioPath(audio);
-      AudioRecorder.prepareRecordingAtPath(audio, {
-        SampleRate: 22050,
-        Channels: 1,
-        AudioQuality: 'High',
-        AudioEncoding: 'aac',
-      });
-    }
-    await AudioRecorder.startRecording();
-  };
-
-
-  const handlePress = marker => {
-    console.log('Button pressed for:', marker.name);
-
-    const newRegion = {
-      latitude: marker.latitude,
-      longitude: marker.longitude,
-      latitudeDelta: 0.01,
-      longitudeDelta: 0.01,
-    };
-    mapRef.current.animateToRegion(newRegion, 1000); // Added duration for the animation
-  };
-
-  const toggleCheckIn = (markerId) => {
-    setCheckedIn(prevCheckedIn => ({
-      ...prevCheckedIn,
-      [markerId]: !prevCheckedIn[markerId],
-    }));
-  };
-
   const openCameraAndSaveImage = id => {
     const options = {
       saveToPhotos: true,
@@ -392,34 +319,6 @@ const MapViewComponent = () => {
     });
   };
 
-  const handleCheckIn = async (marker) => {
-    const documentId = `${marker.longitude}${marker.latitude}`;
-    const currentlyCheckedIn = !!checkedIn[marker.id];
-    const incrementValue = currentlyCheckedIn ? -1 : 1;
-    const docRef = firestore().collection('checkins').doc(documentId);
-
-    try {
-      await docRef.update({
-        count: firestore.FieldValue.increment(incrementValue)
-      });
-
-      setCheckedIn(prevCheckedIn => ({
-        ...prevCheckedIn,
-        [marker.id]: !currentlyCheckedIn,
-      }));
-
-      const doc = await docRef.get();
-      if (doc.exists) {
-        setMarkerCounts(prevCounts => ({
-          ...prevCounts,
-          [documentId]: doc.data().count,
-        }));
-      }
-    } catch (error) {
-      console.error("Error updating check-in status:", error);
-    }
-  };
-
   const getCurrentLocation = () => {
     console.log('Attempting to get current position...');
 
@@ -443,15 +342,6 @@ const MapViewComponent = () => {
     );
   };
 
-  const CheckmarkBox = ({ isChecked, onPress }) => (
-    <TouchableOpacity onPress={onPress} style={styles.checkboxContainer}>
-      {isChecked && <Text style={styles.checkboxCheck}>✓</Text>}
-    </TouchableOpacity>
-  );
-
-  function sanitizeURL(str) {
-    return str.replace(/[^a-zA-Z0-9\-_\.!~*'()]/g, '');
-  }
   return (
     <View style={styles.container}>
       <View style={styles.mapContainer}>
@@ -469,58 +359,16 @@ const MapViewComponent = () => {
               }}>
               {markers.length > 0 &&
                 markers.map((marker, index) => (
-                  <Marker
-                    key={index}
-                    identifier={marker.id}
-                    coordinate={{
-                      latitude: marker.latitude,
-                      longitude: marker.longitude,
-                    }}
-                    title={marker.name}
-                    description={marker.address}>
-                    <View style={styles.circle}>
-                      <LinearGradient
-                        colors={['#00AEE9', '#FFFFFF']} // Replace with your gradient colors
-                        style={styles.circle}
-                        start={{ x: 0, y: 0 }} // Gradient starting position
-                        end={{ x: 1, y: 1 }} // Gradient ending position
-                      >
-                        <Text style={styles.number}>{marker.id}</Text>
-                      </LinearGradient>
-
-                    </View>
-                    <Callout onPress={() => handlePress(marker)}>
-                      <View style={styles.calloutView}>
-                        <TouchableOpacity onPress={() => openInAppBrowser(`https://www.j.country/tag/${sanitizeURL(marker.name)}`)}>
-                          <Text style={styles.calloutTitle}>{marker.name}</Text>
-                        </TouchableOpacity>
-                        <Text style={styles.calloutDescription}>{marker.address.split(',')[0]}</Text>
-                        <View style={styles.buttonContainer}>
-                          {/* <CheckInButton
-                            isChecked={!!checkedIn[marker.id]}
-                            onPress={() => {
-                              toggleCheckIn(marker.id);
-                              handleCheckIn(marker);
-                            }}
-                          /> */}
-                          
-                          <TouchableOpacity
-                            style={{ flexDirection: 'row', alignItems: 'center' }}
-                            onPress={() => {
-                              if (isRecording) {
-                                stopRecordingAndPlayBackEventPopup(marker.id);
-                              } else {
-                                startRecordingEventPopup(marker);
-                              }
-                            }}>
-                            <Animated.View style={{ opacity }}>
-                              <Icon name={isRecording ? "mic" : "mic-none"} size={30} color={isRecording ? "red" : "#00ace8"} />
-                            </Animated.View>
-                          </TouchableOpacity>
-                        </View>
-                      </View>
-                    </Callout>
-                  </Marker>
+                  <MapMarker
+                  key={index}
+                  marker={marker}
+                  isRecording={isRecording}
+                  setIsRecording={setIsRecording}
+                  setMarkers={setMarkers}
+                  mapRef={mapRef}
+                  hasPermission={hasPermission}
+                  currentIndex={currentIndex}
+                />
                 ))}
             </MapView>
             <View style={styles.overlayButtons}>
@@ -574,15 +422,7 @@ const MapViewComponent = () => {
           onSnapToItem={index => {
             console.log("New Index:", index); //r Debugging log
             setCurrentIndex(index);
-            const newRegion = {
-              latitude: markers[index].latitude,
-              longitude: markers[index].longitude,
-              latitudeDelta: 0.01,
-              longitudeDelta: 0.01,
-            };
-            mapRef.current.animateToRegion(newRegion);
             carouselRef.current?.scrollTo({ index: index, animated: true })
-
           }}
           renderItem={({ item, index }) => (
             <TouchableOpacity onPress={() => openCameraAndSaveImage(item.id)}>
@@ -608,14 +448,6 @@ const MapViewComponent = () => {
           onSnapToItem={index => {
             console.log("New Index:", index); //r Debugging log
             setCurrentIndex(index);
-
-            const newRegion = {
-              latitude: markers[index].latitude,
-              longitude: markers[index].longitude,
-              latitudeDelta: 0.01,
-              longitudeDelta: 0.01,
-            };
-            mapRef.current.animateToRegion(newRegion);
             carouselRefImages.current?.scrollTo({ index: index, animated: true })
             
           }}
@@ -632,157 +464,5 @@ const MapViewComponent = () => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1, // Use flex to fill the entire screen
-    // backgroundColor: '#404040',
-  },
-  mapContainer: {
-    flex: 1, // This will make the map container take up all available space except for what the containerActionBottom uses
-  },
-  map: {
-    ...StyleSheet.absoluteFillObject, // This will make the map fill the mapContainer
-  },
-  carouselItemContainer: {
-    flexDirection: 'row', // Align items horizontally
-    alignItems: 'center', // Center items vertically in the container
-    justifyContent: 'space-between', // Space between the image and text content
-    width: windowWidth, // Match the width of the carousel
-    paddingHorizontal: 10, // Add some horizontal padding
-    height: 100
-  },
-  overlayButtons: {
-    position: 'absolute', // Position buttons over the map
-    bottom: 10, // Adjust based on your layout
-    right: 10,
-    alignItems: 'flex-end',
-  },
-  containerActionBottom: {
-    flexDirection: 'row',
-    padding: 10,
-    backgroundColor: '#404040',
-  },
-  carouselImages: {
-    backgroundColor: 'transparent', // Completely transparent background
-    justifyContent: 'center',
-  },
-  circle: {
-    width: 40,
-    height: 40,
-    borderRadius: 30,
-    backgroundColor: '#00ace8',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  containerAction: {
-    flexDirection: 'row',
-    padding: 10,
-    alignItems: 'center',
-    borderTopLeftRadius: 10, // Adjust the radius as needed
-    borderTopRightRadius: 10,
-  },
-  contentAction: {
-    flexGrow: 6,
-    flexDirection: 'column',
-    color: 'white', // Ensure this contrasts with the background
-    marginBottom: 8,
-    marginLeft: 10,
-    height: 100,
-    width: 100
-  },
-  textAction: {
-    flexGrow: 1,
-    fontSize: 12,
-    paddingTop: 5,
-    paddingRight: 15,
-    paddingBottom: 5,
-    textAlignVertical: 'center',
-    textAlign: 'left',
-    color: 'white',
-  },
-  textActionAddress: {
-    paddingRight: 25,
-    flexGrow: 0,
-    textAlign: 'right',
-    textAlignVertical: 'bottom',
-    fontSize: 12,
-    marginBottom: 8, // Adjust based on your spacing needs
-    marginLeft: 10, // Adjust the spacing between the text and the imag
-    color: 'white',
-  },
-  imageAction: {
-    maxWidth: 300,
-    maxHeight: 150,
-    width: 292, // Adjust based on your image size
-    height: 150, // Adjust based on your image size
-    backgroundColor: 'transparent', // Completely transparent background
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  number: {
-    color: 'white',
-    fontSize: 20,
-  },
-  calloutView: {
-    padding: 8,
-    width: 250,
-    height: 'auto',
-    borderRadius: 6,
-  },
-  calloutTitle: {
-    fontWeight: 'bold',
-    fontSize: 22,
-    marginBottom: 5,
-  },
-  calloutDescription: {
-    fontSize: 16,
-    marginBottom: 10,
-  },
-  buttonContainer: {
-    //  flexDirection: 'row',
-    //  justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  locationButton: {
-    position: 'absolute', // Position the button over the map
-    bottom: 135, // Distance from the bottom of the container
-    right: 10, // Distance from the right of the container
-    padding: 10, // Add some padding for visual appeal (optional)
-    backgroundColor: 'white', // Set the background color (optional)
-    borderRadius: 20, // Round the corners (optional)
-  },
-  actionButton: {
-    position: 'absolute', // Position the button over the map
-    bottom: 80, // Distance from the bottom of the container
-    right: 10, // Distance from the right of the container
-    padding: 10, // Add some padding for visual appeal (optional)
-    backgroundColor: 'white', // Set the background color (optional)
-    borderRadius: 20, // Round the corners (optional)
-  },
-  micButton: {
-    position: 'absolute', // Position the button over the map
-    bottom: 25, // Distance from the bottom of the container
-    right: 10, // Distance from the right of the container
-    padding: 10, // Add some padding for visual appeal (optional)
-    backgroundColor: 'white', // Set the background color (optional)
-    borderRadius: 20, // Round the corners (optional)
-  },
-  checkboxContainer: {
-    width: 18,
-    height: 18,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#00ace8',
-    marginRight: 8,
-  },
-  checkboxCheck: {
-    fontSize: 18,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-});
 
 export default MapViewComponent;
