@@ -1,10 +1,10 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {View, Dimensions, Text} from 'react-native';
 import Carousel from 'react-native-reanimated-carousel';
-import {styles} from './MemosCarousel.styles';
+
 import {useUserContext} from '../../context/UserContext';
 import {MapMarker} from '../../apis/markers';
-
+import {styles} from './MemosCarousel.styles';
 interface MemosCarouselProps {
   markers: MapMarker[];
   setCurrentIndex: React.Dispatch<React.SetStateAction<number>>;

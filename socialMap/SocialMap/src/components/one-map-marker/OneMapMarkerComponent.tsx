@@ -12,16 +12,6 @@ import openInAppBrowser from '../BrowserView';
 import {styles} from './OneMapMarker.styles';
 import {type MapMarker} from '../../apis/markers';
 
-// export interface Marker {
-//   id: any;
-//   name: string;
-//   memoTranscription: string;
-//   latitude: number;
-//   longitude: number;
-//   address: string;
-//   image: string;
-// }
-
 interface MapMarkerProps {
   marker: MapMarker;
   isRecording: boolean;

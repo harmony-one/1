@@ -17,6 +17,9 @@ export const styles = StyleSheet.create({
     right: 10,
     alignItems: 'flex-end',
   },
+  postText: {
+    fontSize: 44,
+  },
   actionButton: {
     position: 'absolute', // Position the button over the map
     bottom: 80, // Distance from the bottom of the container

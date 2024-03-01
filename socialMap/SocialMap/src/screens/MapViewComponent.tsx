@@ -65,9 +65,8 @@ const MapViewComponent = () => {
 
   useEffect(() => {
     if (markers && mapRef.current) {
-      //@ts-ignore
-      mapRef.current.fitToSuppliedMarkers(
-        markers.map(marker => marker.id),
+      (mapRef.current as MapView).fitToSuppliedMarkers(
+        markers.map(marker => `${marker.id}`),
         {
           edgePadding: {top: 50, right: 50, bottom: 50, left: 50},
           animated: true,
@@ -199,15 +198,7 @@ const MapViewComponent = () => {
                 ...prevMarkers,
                 newMarker,
               ]);
-              //@ts-ignore
               setCurrentIndex(markers ? markers.length + 1 : 1);
-              // mapRef.current.animateToRegion(newRegion, 1000); // Added duration for animation
-              // setTimeout(() => {
-              //   carouselRef.current?.scrollTo({
-              //     index: markers.length,
-              //     animated: true,
-              //   });
-              // }, 1000); // Adjust the delay as needed
             }
           },
           error => {
