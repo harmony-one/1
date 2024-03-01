@@ -1,18 +1,20 @@
-//@ts-nocheck
 import React, {useEffect, useRef, useState} from 'react';
 import {View, Dimensions, TouchableOpacity, Image} from 'react-native';
 import RNFS from 'react-native-fs';
 import Carousel from 'react-native-reanimated-carousel';
-import {launchCamera} from 'react-native-image-picker';
+import {
+  launchCamera,
+  CameraOptions,
+  ImagePickerResponse,
+} from 'react-native-image-picker';
 
-import {Marker} from '../map-marker/MapMarkerComponent';
 import {styles} from './ImageCarousel.styles';
+import {MapMarker} from '../../apis/markers';
 
 interface ImageCarouselProps {
-  markers: Marker[];
-  setIsRecording: React.Dispatch<React.SetStateAction<boolean>>; // (isRecording: boolean) => void;
+  markers: MapMarker[];
   setCurrentIndex: React.Dispatch<React.SetStateAction<number>>;
-  setMarkers: React.Dispatch<React.SetStateAction<Marker[]>>;
+  setMarkers: React.Dispatch<React.SetStateAction<MapMarker[]>>;
   currentIndex: number;
 }
 
@@ -27,29 +29,31 @@ const ImageCarousel = (props: ImageCarouselProps) => {
     console.log('useEffect', currentIndex);
     if (selectedImage !== currentIndex) {
       setSelectedImage(currentIndex);
-      carouselRefImages.current?.scrollTo({
-        index: currentIndex,
-        animated: true,
-      });
+      if (carouselRefImages.current) {
+        (carouselRefImages.current as any).scrollTo({
+          index: currentIndex,
+          animated: true,
+        });
+      }
     }
   }, [currentIndex, carouselRefImages, selectedImage]);
 
   const openCameraAndSaveImage = (id: number) => {
-    const options = {
+    const options: CameraOptions = {
       saveToPhotos: true,
       mediaType: 'photo',
     };
     console.log('open Camera And SaveImage called');
-    launchCamera(options, async response => {
+    launchCamera(options, async (response: ImagePickerResponse) => {
       console.log('RESPONSE', response);
       if (response.didCancel) {
         console.log('User cancelled image capture');
-      } else if (response.error) {
-        console.log('ImagePicker Error: ', response.error);
-      } else if (response.customButton) {
-        console.log('User tapped custom button: ', response.customButton);
+      } else if (response.errorCode) {
+        console.log('ImagePicker Error: ', response.errorMessage);
+        // } else if (response. assets .customButton) {
+        //   console.log('User tapped custom button: ', response.customButton);
       } else {
-        const source = {uri: response.assets[0].uri};
+        const source = {uri: response.assets && response.assets[0].uri};
         console.log('Image captured:', source.uri);
 
         // Save the image to the app's document directory
@@ -57,20 +61,22 @@ const ImageCarousel = (props: ImageCarouselProps) => {
         const newImageName = `image_${timestamp}.jpg`; // Generate a unique file name
         const newImagePath = `${RNFS.DocumentDirectoryPath}/${newImageName}`;
         try {
-          await RNFS.copyFile(source.uri, newImagePath);
-          console.log('Image saved to:', newImagePath);
-          // Here you can update your state or UI with the new image path
-          const updatedMarkers = markers.map(marker =>
-            marker.id === id
-              ? {
-                  ...marker,
-                  image: marker.image // Ensure the property name's case matches
-                    ? `${marker.image}\n${newImagePath}`
-                    : newImagePath,
-                }
-              : marker,
-          );
-          setMarkers(updatedMarkers);
+          if (source.uri) {
+            await RNFS.copyFile(source.uri, newImagePath);
+            console.log('Image saved to:', newImagePath);
+            // Here you can update your state or UI with the new image path
+            const updatedMarkers = markers.map(marker =>
+              marker.id === id
+                ? {
+                    ...marker,
+                    image: marker.image // Ensure the property name's case matches
+                      ? `${marker.image}\n${newImagePath}`
+                      : newImagePath,
+                  }
+                : marker,
+            );
+            setMarkers(updatedMarkers);
+          }
         } catch (error) {
           console.error('Error saving image:', error);
         }
@@ -108,7 +114,7 @@ const ImageCarousel = (props: ImageCarouselProps) => {
                   : require('../../assets/group.png')
               }
               // eslint-disable-next-line react-native/no-inline-styles
-              style={[styles.imageAction, {borderRadrius: 15}]}
+              style={[styles.imageAction, {borderRadius: 15}]}
             />
           </TouchableOpacity>
         )}
