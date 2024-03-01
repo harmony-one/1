@@ -17,6 +17,7 @@ export interface Marker {
   latitude: number;
   longitude: number;
   address: string;
+  image: string;
 }
 
 interface MapMarkerProps {
@@ -89,9 +90,7 @@ const MapMarker = (props: MapMarkerProps) => {
   }, [isRecording]);
 
   useEffect(() => {
-    console.log('here', currentIndex, marker.id, marker.name);
     if (currentIndex === marker.id && mapRef.current) {
-      console.log('here 2');
       const {latitude, longitude} = marker;
       // @ts-ignore
       mapRef.current.animateToRegion(

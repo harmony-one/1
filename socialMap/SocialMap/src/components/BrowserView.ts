@@ -1,6 +1,6 @@
 import InAppBrowser from 'react-native-inappbrowser-reborn';
 
-const openInAppBrowser = async (url) => {
+const openInAppBrowser = async (url: string) => {
   try {
     if (await InAppBrowser.isAvailable()) {
       const result = await InAppBrowser.open(url, {
@@ -27,7 +27,7 @@ const openInAppBrowser = async (url) => {
       });
       console.log(result);
     }
-  } catch (error) {
+  } catch (error: any) {
     console.log(error.message);
   }
 };
