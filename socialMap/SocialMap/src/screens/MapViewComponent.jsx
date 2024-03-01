@@ -436,7 +436,7 @@ const MapViewComponent = () => {
             <View style={styles.carouselItemContainer}>
               <View style={styles.contentAction}>
                 <Text style={styles.textAction}>{item.memoTranscription || 'No memo transcription available'}</Text>
-                <Text style={styles.textActionAddress}>{'#' + index == 0 ? 1 : index + 1 + ' ' + getAddressShort() + ' @' + item.address || 'No address available'}</Text>
+                <Text style={styles.textActionAddress}>{`#${index == 0 ? 1 : index + 1}`} {`0/${getAddressShort()}`} {`${item.address ? '@ ' + item.address : 'No address available'}`}</Text>
               </View>
             </View>
           )}
