@@ -26,7 +26,6 @@ const ImageCarousel = (props: ImageCarouselProps) => {
   const carouselRefImages = useRef(null);
 
   useEffect(() => {
-    console.log('useEffect', currentIndex);
     if (selectedImage !== currentIndex) {
       setSelectedImage(currentIndex);
       if (carouselRefImages.current) {

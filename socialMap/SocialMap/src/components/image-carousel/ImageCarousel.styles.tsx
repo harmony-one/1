@@ -2,6 +2,7 @@ import {StyleSheet} from 'react-native';
 
 export const styles = StyleSheet.create({
   carouselImages: {
+    // backgroundColor: '#404040',
     backgroundColor: 'transparent', // Completely transparent background
     justifyContent: 'center',
   },
