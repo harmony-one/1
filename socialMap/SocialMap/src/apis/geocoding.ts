@@ -1,9 +1,10 @@
-
 import config from '../config';
 
-export const getMarkerAddress = async (latitude: number, longitude: number): Promise<string | null> => {
+export const getMarkerAddress = async (
+  latitude: number,
+  longitude: number,
+): Promise<string | null> => {
   const apiKey = config.googleMap_api_key;
-  console.log('apiKey:', apiKey);
 
   const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`;
 

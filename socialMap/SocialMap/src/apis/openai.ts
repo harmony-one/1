@@ -10,7 +10,6 @@ export async function speechToText(filePath: string): Promise<string> {
       type: 'audio/mp4', // Adjust based on your audio file's format, e.g., 'audio/wav' for WAV files
       name: 'openai.mp3', // The file name doesn't impact the API request but is required for FormData
     });
-    console.log('HELLO +++++', formData);
     const request = {
       method: 'post',
       maxBodyLength: Infinity,

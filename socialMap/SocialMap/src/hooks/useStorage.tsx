@@ -10,6 +10,7 @@ interface StorageType {
   removeValue: (key: string) => void;
 }
 
+// TODO: migrate to https://react-native-async-storage.github.io/async-storage/docs/install
 const useStorage = (): StorageType => {
   const [storage, setStorage] = useState<Storage>(null);
 

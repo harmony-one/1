@@ -5,25 +5,18 @@ import LinearGradient from 'react-native-linear-gradient';
 import {AudioRecorder, AudioUtils} from 'react-native-audio';
 import Toast from 'react-native-toast-message';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import MapView from 'react-native-maps';
 
 import {speechToText} from '../../apis/openai';
 import openInAppBrowser from '../BrowserView';
-import {styles} from './MapMarker.styles';
-
-export interface Marker {
-  id: any;
-  name: string;
-  memoTranscription: string;
-  latitude: number;
-  longitude: number;
-  address: string;
-}
+import {styles} from './OneMapMarker.styles';
+import {type MapMarker} from '../../apis/markers';
 
 interface MapMarkerProps {
-  marker: Marker;
+  marker: MapMarker;
   isRecording: boolean;
   setIsRecording: React.Dispatch<React.SetStateAction<boolean>>; // (isRecording: boolean) => void;
-  setMarkers: React.Dispatch<React.SetStateAction<Marker[]>>;
+  setMarkers: React.Dispatch<React.SetStateAction<MapMarker[]>>;
   hasPermission: boolean;
   mapRef: React.MutableRefObject<null>;
   currentIndex: number;
@@ -33,7 +26,7 @@ function sanitizeURL(str: string) {
   return str.replace(/[^a-zA-Z0-9\-_.!~*'()]/g, '');
 }
 
-const MapMarker = (props: MapMarkerProps) => {
+const OneMapMarker = (props: MapMarkerProps) => {
   const {
     marker,
     isRecording,
@@ -57,8 +50,11 @@ const MapMarker = (props: MapMarkerProps) => {
       latitudeDelta: 0.01,
       longitudeDelta: 0.01,
     };
-    //@ts-ignore
-    mapRef.current.animateToRegion(newRegion, 1000); // Added duration for the animation
+    if (mapRef.current) {
+      (mapRef.current as MapView).animateToRegion(newRegion);
+    } else {
+      console.error('mapRef is null');
+    } // Added duration for the animation
   };
 
   useEffect(() => {
@@ -89,20 +85,22 @@ const MapMarker = (props: MapMarkerProps) => {
   }, [isRecording]);
 
   useEffect(() => {
-    console.log('here', currentIndex, marker.id, marker.name);
-    if (currentIndex === marker.id && mapRef.current) {
-      console.log('here 2');
+    if (currentIndex === marker.id - 1 && mapRef.current) {
       const {latitude, longitude} = marker;
       // @ts-ignore
-      mapRef.current.animateToRegion(
-        {
-          latitude,
-          longitude,
-          latitudeDelta: 0.01,
-          longitudeDelta: 0.01,
-        },
-        1000,
-      );
+      if (mapRef.current) {
+        (mapRef.current as MapView).animateToRegion(
+          {
+            latitude,
+            longitude,
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
+          },
+          1000,
+        );
+      } else {
+        console.error('mapRef is null');
+      }
     }
   }, [currentIndex, marker, mapRef]);
 
@@ -163,7 +161,7 @@ const MapMarker = (props: MapMarkerProps) => {
 
   return (
     <Marker
-      identifier={marker.id}
+      identifier={`${marker.id}`}
       coordinate={{
         latitude: marker.latitude,
         longitude: marker.longitude,
@@ -219,4 +217,4 @@ const MapMarker = (props: MapMarkerProps) => {
   );
 };
 
-export default MapMarker;
+export default OneMapMarker;
