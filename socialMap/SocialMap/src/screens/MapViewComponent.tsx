@@ -1,25 +1,25 @@
 // MapViewComponent.jsx
-import React, {useEffect, useRef, useState} from 'react';
-import {View, Text, TouchableOpacity, Alert, Animated} from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, Text, TouchableOpacity, Alert, Animated } from 'react-native';
 import MapView from 'react-native-maps';
-import {AudioRecorder, AudioUtils} from 'react-native-audio';
+import { AudioRecorder, AudioUtils } from 'react-native-audio';
 import Toast from 'react-native-toast-message';
 import Geolocation from '@react-native-community/geolocation';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import firestore from '@react-native-firebase/firestore';
 
-import {speechToText} from '../apis/openai';
-import {type MapMarker, getMapMarkers} from '../apis/markers';
-import {getMarkerAddress} from '../apis/geocoding';
+import { speechToText } from '../apis/openai';
+import { type MapMarker, getMapMarkers } from '../apis/markers';
+import { getMarkerAddress } from '../apis/geocoding';
 
 import ImageCarousel from '../components/image-carousel/ImageCarouselComponent';
 import MemosCarousel from '../components/memos-carousel/MemosCarouselComponent';
 import OneMapMarker from '../components/one-map-marker/OneMapMarkerComponent';
-import {styles} from './MapView.styles';
+import { styles } from './MapView.styles';
 
 const MapViewComponent = () => {
   // State for managing recording
-  const [markers, setMarkers] = useState<MapMarker[]>([]);
+  const [markers, setMarkers] = useState < MapMarker[] > ([]);
   const [isRecording, setIsRecording] = useState(false);
   const [hasPermission, setHasPermission] = useState(false);
   const [, setMarkerCounts] = useState({});
@@ -31,7 +31,7 @@ const MapViewComponent = () => {
   const mapRef = useRef(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const opacity = useRef(new Animated.Value(1)).current; // For opacity animation
-   const carouselRef = useRef(null);
+  const carouselRef = useRef(null);
 
   useEffect(() => {
     const getMarkers = async () => {
@@ -66,11 +66,11 @@ const MapViewComponent = () => {
   useEffect(() => {
     const updatedCount = markers.length;
     const latestData = markers[updatedCount - 1];
-  
+
     console.log("Updated markers count:", updatedCount);
     console.log("Latest marker data:", latestData);
     // Perform actions with the updated count and latest data here
-  
+
   }, [markers]); // This
 
   useEffect(() => {
@@ -78,7 +78,7 @@ const MapViewComponent = () => {
       (mapRef.current as MapView).fitToSuppliedMarkers(
         markers.map(marker => `${marker.id}`),
         {
-          edgePadding: {top: 50, right: 50, bottom: 50, left: 50},
+          edgePadding: { top: 50, right: 50, bottom: 50, left: 50 },
           animated: true,
         },
       );
@@ -90,7 +90,7 @@ const MapViewComponent = () => {
       if (!markers || markers.length === 0) {
         return;
       }
-      const countsMap: {[key: string]: number} = {};
+      const countsMap: { [key: string]: number } = {};
       const fetchPromises = markers.map(marker => {
         const documentId = `${marker.longitude}${marker.latitude}`;
         return firestore()
@@ -181,7 +181,7 @@ const MapViewComponent = () => {
           async position => {
             // Corrected syntax for async callback
             console.log('Current position:', position);
-            const {latitude, longitude} = position.coords;
+            const { latitude, longitude } = position.coords;
             const newRegion = {
               latitude,
               longitude,
@@ -211,17 +211,25 @@ const MapViewComponent = () => {
               setCurrentIndex(markers ? markers.length + 1 : 1);
               if (mapRef.current) {
                 (mapRef.current as MapView).animateToRegion(newRegion);
-                console.error('map moved tor');
+                console.log('map moved tor');
               } else {
                 console.error('mapRef is null');
               }
-                      }
+            }
+            setTimeout(() => {
+              (carouselRef.current as any).scrollTo({
+                index: markers.length,
+                animated: true,
+              });
+            }, 1000); // Adjust the delay as needed
+
+
           },
           error => {
             console.error('Error getting current position:', error);
             Alert.alert('Error', 'Unable to fetch current location.');
           },
-          {enableHighAccuracy: true},
+          { enableHighAccuracy: true },
         );
       } else {
         Toast.show({
@@ -244,7 +252,7 @@ const MapViewComponent = () => {
     Geolocation.getCurrentPosition(
       position => {
         console.log('Current position:', position);
-        const {latitude, longitude} = position.coords;
+        const { latitude, longitude } = position.coords;
         const newRegion = {
           latitude,
           longitude,
@@ -254,7 +262,7 @@ const MapViewComponent = () => {
 
         if (mapRef.current) {
           (mapRef.current as MapView).animateToRegion(newRegion);
-          console.error('map moved tor');
+          console.log('map moved tor');
         } else {
           console.error('mapRef is null');
         }
@@ -263,7 +271,7 @@ const MapViewComponent = () => {
         console.error('Error getting current position:', error);
         Alert.alert('Error', error.message);
       },
-      {enableHighAccuracy: true},
+      { enableHighAccuracy: true },
     );
   };
 
@@ -275,6 +283,9 @@ const MapViewComponent = () => {
             <MapView
               ref={mapRef}
               style={styles.map}
+              showsUserLocation={true}
+              userInterfaceStyle={'dark'}
+              userLocationPriority = {'high'}
               initialRegion={{
                 latitude: 39.739235,
                 longitude: -104.99025,
@@ -316,7 +327,7 @@ const MapViewComponent = () => {
                       startRecording();
                     }
                   }}>
-                  <Animated.View style={{opacity}}>
+                  <Animated.View style={{ opacity }}>
                     <Icon
                       name={isRecording ? 'mic' : 'mic-none'}
                       size={25}
@@ -344,6 +355,7 @@ const MapViewComponent = () => {
         markers={markers}
         setCurrentIndex={setCurrentIndex}
         currentIndex={currentIndex}
+        carouselRef={carouselRef}
       />
     </View>
   );
