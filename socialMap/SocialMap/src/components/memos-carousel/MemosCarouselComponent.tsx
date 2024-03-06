@@ -1,10 +1,12 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {View, Dimensions, Text} from 'react-native';
+import {View, Dimensions, Text, TouchableOpacity, Image} from 'react-native';
 import Carousel from 'react-native-reanimated-carousel';
 
 import {useUserContext} from '../../context/UserContext';
 import {MapMarker} from '../../apis/markers';
 import {styles} from './MemosCarousel.styles';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+
 interface MemosCarouselProps {
   markers: MapMarker[];
   setCurrentIndex: React.Dispatch<React.SetStateAction<number>>;
@@ -31,6 +33,12 @@ const MemosCarousel = (props: MemosCarouselProps) => {
     }
   }, [currentIndex, carouselRefMemos, selectedMemo]);
 
+   // Share Action start
+   const shareAction = async () => {
+    console.log('shareAction');
+ 
+  };
+
   return (
     <View style={styles.containerActionBottom}>
       <Carousel
@@ -38,7 +46,7 @@ const MemosCarousel = (props: MemosCarouselProps) => {
         ref={carouselRefMemos}
         key={markers.length}
         width={windowWidth - 10} // Use the width of the window/device
-        height={120} // Fixed height for each item
+        height={175} // Fixed height for each item
         data={markers}
         onSnapToItem={index => {
           console.log('New Index: containerActionBottom', index); //r Debugging log
@@ -48,18 +56,22 @@ const MemosCarousel = (props: MemosCarouselProps) => {
         }}
         renderItem={({item, index}) => (
           <View style={styles.carouselItemContainer}>
-            <View style={styles.contentAction}>
-              <Text style={styles.textAction}>
-                {item.memoTranscription || 'No memo transcription available'}
-              </Text>
+          <View style={styles.contentAction}>
+            <Text style={styles.textAction}>
+              {item.memoTranscription || 'No memo transcription available'}
+            </Text>
+        
+            {/* New container for the address and share button */}
+            <View style={styles.actionContainer}>
+              <TouchableOpacity onPress={shareAction} style={styles.shareAction}>
+                <Image source={require('../../assets/share.png')} />
+              </TouchableOpacity>
               <Text style={styles.textActionAddress}>
-                {`#${index === 0 ? 1 : index}`} {`0/${getAddressShort()}`}{' '}
-                {`${
-                  item.address ? '@ ' + item.address : 'No address available'
-                }`}
+                {`#${index === 0 ? 1 : index} 0/${getAddressShort()} ${item.address ? '@ ' + item.address : 'No address available'}`}
               </Text>
             </View>
           </View>
+        </View>
         )}
       />
     </View>

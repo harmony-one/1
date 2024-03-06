@@ -15,7 +15,7 @@ export const styles = StyleSheet.create({
     justifyContent: 'space-between', // Space between the image and text content
     width: windowWidth, // Match the width of the carousel
     paddingHorizontal: 10, // Add some horizontal padding
-    height: 100,
+    height: 175,
   },
   contentAction: {
     flexGrow: 6,
@@ -23,7 +23,7 @@ export const styles = StyleSheet.create({
     color: 'white', // Ensure this contrasts with the background
     marginBottom: 8,
     marginLeft: 10,
-    height: 100,
+    height: 175,
     width: 100,
   },
   textAction: {
@@ -36,14 +36,34 @@ export const styles = StyleSheet.create({
     textAlign: 'left',
     color: 'white',
   },
-  textActionAddress: {
-    paddingRight: 25,
-    flexGrow: 0,
-    textAlign: 'right',
-    textAlignVertical: 'bottom',
-    fontSize: 12,
-    marginBottom: 8, // Adjust based on your spacing needs
-    marginLeft: 10, // Adjust the spacing between the text and the imag
-    color: 'white',
+  
+
+
+  // New style for the container of the address and share action
+  actionContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between', // This will align `textActionAddress` to the right and `shareAction` to the left
+    alignItems: 'center', // This will vertically center the contents
+    height: 34, // Set the height you prefer
+    paddingHorizontal: 10, // Add horizontal padding if needed
   },
+  // Updated `textActionAddress` style
+  textActionAddress: {
+    // flexGrow has been removed
+    fontSize: 12,
+    color: '#00aee9',
+    paddingRight: 15,
+    // marginLeft has been removed
+    // paddingRight has been removed, assuming the container padding handles this
+  },
+
+  // Updated `shareAction` style
+  shareAction: {
+    // Removed marginBottom and flexGrow
+    // paddingRight has been removed, assuming the container padding handles this
+    height: 34, // Ensure the button has a height
+    width: 34, // Ensure the button has a width
+    // Add marginLeft if you want to push the button a bit to the right from the edge
+  },
+  
 });

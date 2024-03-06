@@ -31,7 +31,7 @@ const MapViewComponent = () => {
   const mapRef = useRef(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const opacity = useRef(new Animated.Value(1)).current; // For opacity animation
-  // const carouselRef = useRef(null);
+   const carouselRef = useRef(null);
 
   useEffect(() => {
     const getMarkers = async () => {
@@ -62,6 +62,16 @@ const MapViewComponent = () => {
   //     // const latestData = markers[updatedCount - 1];
   //   }
   // }, [markers]); // This
+
+  useEffect(() => {
+    const updatedCount = markers.length;
+    const latestData = markers[updatedCount - 1];
+  
+    console.log("Updated markers count:", updatedCount);
+    console.log("Latest marker data:", latestData);
+    // Perform actions with the updated count and latest data here
+  
+  }, [markers]); // This
 
   useEffect(() => {
     if (markers && mapRef.current) {
@@ -172,12 +182,12 @@ const MapViewComponent = () => {
             // Corrected syntax for async callback
             console.log('Current position:', position);
             const {latitude, longitude} = position.coords;
-            // const newRegion = {
-            //   latitude,
-            //   longitude,
-            //   latitudeDelta: 0.01, // Optionally adjust the latitudeDelta and longitudeDelta
-            //   longitudeDelta: 0.01,
-            // };
+            const newRegion = {
+              latitude,
+              longitude,
+              latitudeDelta: 0.01, // Optionally adjust the latitudeDelta and longitudeDelta
+              longitudeDelta: 0.01,
+            };
 
             const address = await getMarkerAddress(latitude, longitude); // Make sure this function is correctly defined
             if (address) {
@@ -199,7 +209,13 @@ const MapViewComponent = () => {
                 newMarker,
               ]);
               setCurrentIndex(markers ? markers.length + 1 : 1);
-            }
+              if (mapRef.current) {
+                (mapRef.current as MapView).animateToRegion(newRegion);
+                console.error('map moved tor');
+              } else {
+                console.error('mapRef is null');
+              }
+                      }
           },
           error => {
             console.error('Error getting current position:', error);
@@ -235,8 +251,10 @@ const MapViewComponent = () => {
           latitudeDelta: 0.01, // Optionally adjust the latitudeDelta and longitudeDelta
           longitudeDelta: 0.01,
         };
+
         if (mapRef.current) {
           (mapRef.current as MapView).animateToRegion(newRegion);
+          console.error('map moved tor');
         } else {
           console.error('mapRef is null');
         }
@@ -316,12 +334,12 @@ const MapViewComponent = () => {
           </View>
         )}
       </View>
-      <ImageCarousel
+      {/* <ImageCarousel
         markers={markers}
         setMarkers={setMarkers}
         setCurrentIndex={setCurrentIndex}
         currentIndex={currentIndex}
-      />
+      /> */}
       <MemosCarousel
         markers={markers}
         setCurrentIndex={setCurrentIndex}
