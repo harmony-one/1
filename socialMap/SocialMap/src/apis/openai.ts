@@ -36,7 +36,7 @@ export async function speechToText(filePath: string): Promise<string> {
    }
  } catch (error) {
    // Handle errors
-   console.error('Error processing speech to text:', error.message);
+   console.error('Error processing speech to text:', error);
    return ''; // Return empty string if there's an error
  }
 }

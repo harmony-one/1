@@ -34,6 +34,8 @@ export const styles = StyleSheet.create({
     right: 10, // Distance from the right of the container
     padding: 10, // Add some padding for visual appeal (optional)
     backgroundColor: 'white', // Set the background color (optional)
-    borderRadius: 20, // Round the corners (optional)
+    borderRadius: 50, // Round the corners (optional)
+    height: 80,
+    width: 80
   },
 });

@@ -32,6 +32,9 @@ const MapViewComponent = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const opacity = useRef(new Animated.Value(1)).current; // For opacity animation
   const carouselRef = useRef(null);
+  const icoonRef = useRef(null);
+  // State to manage the visibility of the delete button
+  const [showAlternativeButton, setShowAlternativeButton] = useState(false);
 
   useEffect(() => {
     const getMarkers = async () => {
@@ -152,6 +155,8 @@ const MapViewComponent = () => {
       return;
     }
     setIsRecording(true);
+    getCurrentLocation();
+
     const audio =
       AudioUtils.DocumentDirectoryPath + `/voiceMemo_${Date.now()}.mp4`;
     setAudioPath(audio);
@@ -177,60 +182,80 @@ const MapViewComponent = () => {
       const result = await speechToText(audioPath); // Assuming this function exists and works as expected
       if (result) {
         console.log('Transcription result:', result);
-        Geolocation.getCurrentPosition(
-          async position => {
-            // Corrected syntax for async callback
-            console.log('Current position:', position);
-            const { latitude, longitude } = position.coords;
-            const newRegion = {
-              latitude,
-              longitude,
-              latitudeDelta: 0.01, // Optionally adjust the latitudeDelta and longitudeDelta
-              longitudeDelta: 0.01,
-            };
+        // Geolocation.getCurrentPosition(
+        //   async position => {
+        //     // Corrected syntax for async callback
+        //     console.log('Current position:', position);
+        //     const { latitude, longitude } = position.coords;
+        //     const newRegion = {
+        //       latitude,
+        //       longitude,
+        //       latitudeDelta: 0.01, // Optionally adjust the latitudeDelta and longitudeDelta
+        //       longitudeDelta: 0.01,
+        //     };
 
-            const address = await getMarkerAddress(latitude, longitude); // Make sure this function is correctly defined
-            if (address) {
-              console.log('Current address:', address);
-              const newMarker = {
-                //    id: uuid.v4(), // Ensure uuid.v4() is correctly imported and used
-                id: markers ? markers.length + 1 : 1,
-                name: 'New Marker', // Changed from uuid to a descriptive name
-                longitude: longitude,
-                latitude: latitude,
-                address: address.split(',')[0],
-                checked: true,
-                counter: 1,
-                memoTranscription: result,
-              };
+        //     const address = await getMarkerAddress(latitude, longitude); // Make sure this function is correctly defined
+        //     if (address) {
+        //       console.log('Current address:', address);
+        //       const newMarker = {
+        //         //    id: uuid.v4(), // Ensure uuid.v4() is correctly imported and used
+        //         id: markers ? markers.length + 1 : 1,
+        //         name: 'New Marker', // Changed from uuid to a descriptive name
+        //         longitude: longitude,
+        //         latitude: latitude,
+        //         address: address.split(',')[0],
+        //         checked: true,
+        //         counter: 1,
+        //         memoTranscription: result,
+        //       };
 
-              setMarkers((prevMarkers: MapMarker[]) => [
-                ...prevMarkers,
-                newMarker,
-              ]);
-              setCurrentIndex(markers ? markers.length + 1 : 1);
-              if (mapRef.current) {
-                (mapRef.current as MapView).animateToRegion(newRegion);
-                console.log('map moved tor');
-              } else {
-                console.error('mapRef is null');
+        //       setMarkers((prevMarkers: MapMarker[]) => [
+        //         ...prevMarkers,
+        //         newMarker,
+        //       ]);
+        //       setCurrentIndex(markers ? markers.length + 1 : 1);
+        //       if (mapRef.current) {
+        //         (mapRef.current as MapView).animateToRegion(newRegion);
+        //         console.log('map moved tor');
+        //       } else {
+        //         console.error('mapRef is null');
+        //       }
+        //     }
+        //     setTimeout(() => {
+        //       (carouselRef.current as any).scrollTo({
+        //         index: markers.length,
+        //         animated: true,
+        //       });
+        //     }, 1000); // Adjust the delay as needed
+
+
+        //   },
+        //   error => {
+        //     console.error('Error getting current position:', error);
+        //     Alert.alert('Error', 'Unable to fetch current location.');
+        //   },
+        //   { enableHighAccuracy: true },
+        // );
+
+        console.log('Transcription result:', result);
+        setMarkers(prevMarkers =>
+          prevMarkers.map(m =>
+            m.id === markers.length
+              ? {
+                ...m,
+                memoTranscription: m.memoTranscription
+                  ? `${result}`
+                  : result,
               }
-            }
-            setTimeout(() => {
-              (carouselRef.current as any).scrollTo({
-                index: markers.length,
-                animated: true,
-              });
-            }, 1000); // Adjust the delay as needed
-
-
-          },
-          error => {
-            console.error('Error getting current position:', error);
-            Alert.alert('Error', 'Unable to fetch current location.');
-          },
-          { enableHighAccuracy: true },
+              : m,
+          ),
         );
+
+        setShowAlternativeButton(true);
+        setTimeout(() => {
+          setShowAlternativeButton(false);
+        }, 5000); // Hide alternative button after 5 seconds
+
       } else {
         Toast.show({
           type: 'error',
@@ -247,24 +272,55 @@ const MapViewComponent = () => {
   };
 
   const getCurrentLocation = () => {
-    console.log('Attempting to get current position...');
-
     Geolocation.getCurrentPosition(
-      position => {
+      async position => { // Convert the callback to an async function
         console.log('Current position:', position);
         const { latitude, longitude } = position.coords;
         const newRegion = {
           latitude,
           longitude,
-          latitudeDelta: 0.01, // Optionally adjust the latitudeDelta and longitudeDelta
+          latitudeDelta: 0.01, // Adjust the deltas as needed
           longitudeDelta: 0.01,
         };
 
-        if (mapRef.current) {
-          (mapRef.current as MapView).animateToRegion(newRegion);
-          console.log('map moved tor');
-        } else {
-          console.error('mapRef is null');
+        try {
+          const address = await getMarkerAddress(latitude, longitude);
+          if (address) {
+            console.log('Current address:', address);
+            const newMarker = {
+              id: markers ? markers.length + 1 : 1, // Assume markers is accessible
+              name: 'New Marker',
+              longitude: longitude,
+              latitude: latitude,
+              address: address.split(',')[0],
+              checked: true,
+              counter: 1,
+              memoTranscription: '...',
+            };
+
+          
+            setCurrentIndex(markers.length + 1);
+            setMarkers(prevMarkers => [...prevMarkers, newMarker]);
+
+            // Adjust the carousel scrolling as needed
+            setTimeout(() => {
+              if (carouselRef.current) {
+                carouselRef.current.scrollTo({
+                  index: markers.length,
+                  animated: true,
+                });
+              }
+            }, 1000);
+          }
+          if (mapRef.current) {
+            mapRef.current.animateToRegion(newRegion);
+            console.log('Map moved to new position');
+          } else {
+            console.error('mapRef is null');
+          }
+        } catch (error) {
+          console.error('Error processing position:', error);
+          Alert.alert('Error', error.message);
         }
       },
       error => {
@@ -274,6 +330,7 @@ const MapViewComponent = () => {
       { enableHighAccuracy: true },
     );
   };
+
 
   return (
     <View style={styles.container}>
@@ -285,7 +342,7 @@ const MapViewComponent = () => {
               style={styles.map}
               showsUserLocation={true}
               userInterfaceStyle={'dark'}
-              userLocationPriority = {'high'}
+              userLocationPriority={'high'}
               initialRegion={{
                 latitude: 39.739235,
                 longitude: -104.99025,
@@ -307,18 +364,17 @@ const MapViewComponent = () => {
                   />
                 ))}
             </MapView>
-            <View style={styles.overlayButtons}>
-              <View style={styles.actionButton}>
+              {/* <View style={styles.actionButton}>
                 <TouchableOpacity onPress={getCurrentLocation}>
                   <Icon name="near-me" size={25} color="#00ace8" />
                 </TouchableOpacity>
-              </View>
+              </View> */}
               {/* <View style={styles.actionButton}>
                 <TouchableOpacity onPress={actionSheet}>
                   <Icon name="menu" size={25} color="#00ace8" />
                 </TouchableOpacity>
               </View> */}
-              <View style={styles.micButton}>
+              {/* <View style={styles.micButton}>
                 <TouchableOpacity
                   onPress={() => {
                     if (isRecording) {
@@ -328,15 +384,41 @@ const MapViewComponent = () => {
                     }
                   }}>
                   <Animated.View style={{ opacity }}>
-                    <Icon
+                    <Icon ref={icoonRef}
                       name={isRecording ? 'mic' : 'mic-none'}
-                      size={25}
+                      size={60}
                       color={isRecording ? 'red' : '#00ace8'}
                     />
                   </Animated.View>
                 </TouchableOpacity>
               </View>
+            </View> */}
+
+            <View style={styles.container}>
+      <View style={styles.micButton}>
+        {showAlternativeButton ? (
+          // Alternative Button
+          <TouchableOpacity onPress={() => {/* Perform action for alternative button */}}>
+            <View>
+              <Icon name="close" size={60} color="#00ace8" />
             </View>
+          </TouchableOpacity>
+        ) : (
+          // Microphone Button
+          <TouchableOpacity onPress={() => {
+              if (isRecording) {
+                stopRecordingAndPlayBack();
+              } else {
+                startRecording();
+              }
+            }}>
+            <Animated.View style={{ opacity }}>
+              <Icon name={isRecording ? 'mic' : 'mic-none'} size={60} color={isRecording ? 'red' : '#00ace8'} />
+            </Animated.View>
+          </TouchableOpacity>
+        )}
+      </View>
+    </View>
           </>
         ) : (
           <View>

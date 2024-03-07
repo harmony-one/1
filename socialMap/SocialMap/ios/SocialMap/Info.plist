@@ -54,17 +54,33 @@
 	<key>UIAppFonts</key>
 	<array>
 		<string>MaterialIcons.ttf</string>
+		<string>Nunito-Black.ttf</string>
+		<string>Nunito-BlackItalic.ttf</string>
+		<string>Nunito-Bold.ttf</string>
+		<string>Nunito-BoldItalic.ttf</string>
+		<string>Nunito-ExtraBold.ttf</string>
+		<string>Nunito-ExtraBoldItalic.ttf</string>
+		<string>Nunito-ExtraLight.ttf</string>
+		<string>Nunito-ExtraLightItalic.ttf</string>
+		<string>Nunito-Italic.ttf</string>
+		<string>Nunito-Light.ttf</string>
+		<string>Nunito-LightItalic.ttf</string>
+		<string>Nunito-Medium.ttf</string>
+		<string>Nunito-MediumItalic.ttf</string>
+		<string>Nunito-Regular.ttf</string>
+		<string>Nunito-SemiBold.ttf</string>
+		<string>Nunito-SemiBoldItalic.ttf</string>
 	</array>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>We need access to your location to show it on the map</string>
 	<key>CodePushDeploymentKey</key>
-<string>INSERT_YOUR_DEPLOYMENTKEY_HERE</string>
-<key>NSCameraUsageDescription</key>
-<string>Allow ONE Map to Access Your Camera?
+	<string>INSERT_YOUR_DEPLOYMENTKEY_HERE</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Allow ONE Map to Access Your Camera?
 ONE Map needs access to take photos to save memories at each location.</string>
-<key>NSPhotoLibraryUsageDescription</key>
-<string>Allow ONE Map to Access Your photo library? Our application needs access to the photo library to save memories at each location.</string>
-<key>NSPhotoLibraryAddUsageDescription</key>
-<string>Allow ONE Map to Access Your permission to save images to your photo library.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Allow ONE Map to Access Your photo library? Our application needs access to the photo library to save memories at each location.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Allow ONE Map to Access Your permission to save images to your photo library.</string>
 </dict>
 </plist>

@@ -166,8 +166,10 @@ const OneMapMarker = (props: MapMarkerProps) => {
         latitude: marker.latitude,
         longitude: marker.longitude,
       }}
-      title={marker.name}
-      description={marker.address}>
+      // title={marker.name}
+      // description={marker.address}
+      
+      >
       <View style={styles.circle}>
         <LinearGradient
           colors={['#00AEE9', '#FFFFFF']} // Replace with your gradient colors
@@ -178,7 +180,7 @@ const OneMapMarker = (props: MapMarkerProps) => {
           <Text style={styles.number}>{marker.id}</Text>
         </LinearGradient>
       </View>
-      <Callout onPress={handlePress}>
+      {/* <Callout onPress={handlePress}>
         <View style={styles.calloutView}>
           <TouchableOpacity
             onPress={() =>
@@ -212,7 +214,7 @@ const OneMapMarker = (props: MapMarkerProps) => {
             </TouchableOpacity>
           </View>
         </View>
-      </Callout>
+      </Callout> */}
     </Marker>
   );
 };

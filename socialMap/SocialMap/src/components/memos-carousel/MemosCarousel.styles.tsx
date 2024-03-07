@@ -29,10 +29,12 @@ export const styles = StyleSheet.create({
   // New style for the container of the address and share action
   actionContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between', // This will align `textActionAddress` to the right and `shareAction` to the left
+   // justifyContent: 'space-between', // This will align `textActionAddress` to the right and `shareAction` to the left
     alignItems: 'center', // This will vertically center the contents
-    height: 34, // Set the height you prefer
+   // height: 34, // Set the height you prefer
     paddingHorizontal: 10, // Add horizontal padding if needed
+    justifyContent: 'flex-end',
+    paddingBottom: 30,
   },
   // Updated `textActionAddress` style
   textActionAddress: {
@@ -40,7 +42,8 @@ export const styles = StyleSheet.create({
     fontSize: 17,
     color: '#00aee9',
     paddingRight: 15,
-    lineHeight: 24
+   // lineHeight: 24,
+    fontFamily: 'Nunito', 
     // marginLeft has been removed
     // paddingRight has been removed, assuming the container padding handles this
   },
@@ -52,6 +55,7 @@ export const styles = StyleSheet.create({
     height: 34, // Ensure the button has a height
     width: 34, // Ensure the button has a width
     // Add marginLeft if you want to push the button a bit to the right from the edge
+
   },
 
   // Container for the transcription text that has a fixed height
@@ -61,28 +65,55 @@ export const styles = StyleSheet.create({
    paddingRight: 15,
   },
   // Style for the large initial letter
-  dropCap: {
-    fontSize: 30, // Set this to the size you want for the first letter
-    fontWeight: 'bold', // If you want the first letter to be bold
-    color: 'white'
-    // Add other styles like color, fontFamily etc. as required
-  },
+  // dropCap: {
+  //   fontSize: 56, // Set this to the size you want for the first letter
+  //   fontWeight: 'bold', // If you want the first letter to be bold
+  //   color: 'white'
+  //   // Add other styles like color, fontFamily etc. as required
+  // },
 
-  // Style for the rest of the transcription text
-  transcriptionText: {
-    fontSize: 17, // Set this to the size you want for the rest of the text
-    // Add other styles like color, fontFamily etc. as required
-    // height: 135,
-    color: 'white',
-    flexShrink: 1, // Allow text to shrink and not overflow the container
+  // // Style for the rest of the transcription text
+  // transcriptionText: {
+  //   fontSize: 17, // Set this to the size you want for the rest of the text
+  //   // Add other styles like color, fontFamily etc. as required
+  //   // height: 135,
+  //   color: 'white',
+  //   flexShrink: 1, // Allow text to shrink and not overflow the container
 
-  },
+  // },
+  // followText: {
+  //   marginTop: 0, // Adjust as needed to align the text with the top of the drop cap
+  //   // Additional styles as required
+  // },
 
   // Style for the quotation mark and transcription text
-  quotedText: {
-    flexDirection: 'row', // Aligns the drop cap with the rest of the text
-    flexWrap: 'wrap', // Ensures text wraps correctly
-    alignItems: 'flex-end', // Aligns the baseline of the text with the drop cap
+  // quotedText: {
+  //   flexDirection: 'row', // Aligns the drop cap with the rest of the text
+  //   flexWrap: 'wrap', // Ensures text wraps correctly
+  //   alignItems: 'flex-end', // Aligns the baseline of the text with the drop cap
+  // },
+
+  // Style for the drop cap
+  dropCap: {
+    fontSize: 56, // Set this to the size you want for the first letter
+    color: 'white',
+    fontFamily: 'Nunito', 
+    
+  },
+  // Style for the rest of the transcription text
+  transcriptionText: {
+    fontSize: 18, // Set this to the size you want for the rest of the text
+    color: 'white',
+  //  flexShrink: 1, // Allow text to shrink and not overflow the container
+  //  lineHeight: 20, // Adjust this so the text aligns with the bottom of the drop cap if needed
+    // Add other styles like fontFamily etc. as required
+    fontFamily: 'Nunito', 
+    
+  },
+  // Style for the text that immediately follows the drop cap
+  followText: {
+    marginTop: -40, // Negative margin to pull the text up to the top of the drop cap
+    // This value will need to be adjusted depending on the font and sizes used
   },
 
 });

@@ -12,11 +12,8 @@ interface MemosCarouselProps {
   setCurrentIndex: React.Dispatch<React.SetStateAction<number>>;
   currentIndex: number;
   carouselRef: React.MutableRefObject<null>;
-
 }
-
 const windowWidth = Dimensions.get('window').width;
-
 const MemosCarousel = (props: MemosCarouselProps) => {
   const { getAddressShort } = useUserContext();
   const { markers, setCurrentIndex, currentIndex, carouselRef } = props;
@@ -54,23 +51,23 @@ const MemosCarousel = (props: MemosCarouselProps) => {
             <View style={styles.contentAction}>
               <View style={styles.transcriptionContainer}>
                 {item.memoTranscription ? (
-                  <Text numberOfLines={5} ellipsizeMode='tail' style={styles.transcriptionText}>
-                    <Text style={styles.dropCap}>
-                    {`" ${item.memoTranscription.charAt(0)}`}
+                  <Text numberOfLines={3} selectable={true} ellipsizeMode='tail'>
+                    <Text selectable={true} style={styles.dropCap}>
+                      {`${item.memoTranscription.charAt(0)}`}
                     </Text>
-                    <Text style={styles.transcriptionText}>
-                    {`${item.memoTranscription.slice(1)} "`}
+                    <Text selectable={true} style={[styles.transcriptionText, styles.followText]}>
+                      {`${item.memoTranscription.slice(1)}`}
                     </Text>
                   </Text>
                 ) : (
-                  <Text style={styles.transcriptionText}>No memo transcription available</Text>
+                  <Text selectable={true} style={styles.transcriptionText}>No memo transcription available</Text>
                 )}
               </View>
               {/* New container for the address and share button */}
               <View style={styles.actionContainer}>
-                <TouchableOpacity onPress={shareAction} style={styles.shareAction}>
+                {/* <TouchableOpacity onPress={shareAction} style={styles.shareAction}>
                   <Image source={require('../../assets/share.png')} />
-                </TouchableOpacity>
+                </TouchableOpacity> */}
                 {/* {`#${index === 0 ? 1 : index} 0/${getAddressShort()} ${item.address ? '@ ' + item.address : 'No address available'}`} */}
 
                 <Text style={styles.textActionAddress}>
@@ -78,7 +75,7 @@ const MemosCarousel = (props: MemosCarouselProps) => {
                   <Text style={{ textDecorationLine: 'underline' }}>
                     0/babe
                   </Text>
-                  {item.address ? ' @ ' + item.address : ' No address available'}
+                  {item.address ? ' @ ' + item.address.toLowerCase() + ' (2s)' : ' No address available'}
                 </Text>
               </View>
             </View>
