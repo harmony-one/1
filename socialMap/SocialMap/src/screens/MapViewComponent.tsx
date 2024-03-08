@@ -175,13 +175,15 @@ const MapViewComponent = () => {
       return;
     }
     await AudioRecorder.stopRecording();
-    setIsRecording(false);
+  
 
     try {
       console.log(audioPath);
       const result = await speechToText(audioPath); // Assuming this function exists and works as expected
       if (result) {
         console.log('Transcription result:', result);
+        setIsRecording(false);
+       
         // Geolocation.getCurrentPosition(
         //   async position => {
         //     // Corrected syntax for async callback
@@ -237,7 +239,6 @@ const MapViewComponent = () => {
         //   { enableHighAccuracy: true },
         // );
 
-        console.log('Transcription result:', result);
         setMarkers(prevMarkers =>
           prevMarkers.map(m =>
             m.id === markers.length
@@ -261,6 +262,7 @@ const MapViewComponent = () => {
           type: 'error',
           text1: 'The voice memo could not be processed.',
         });
+       setIsRecording(false);
       }
     } catch (error) {
       console.error('Error processing audio:', error);
@@ -268,6 +270,7 @@ const MapViewComponent = () => {
         type: 'error',
         text1: 'Error processing audio.',
       });
+      setIsRecording(false);
     }
   };
 
@@ -295,14 +298,15 @@ const MapViewComponent = () => {
               address: address.split(',')[0],
               checked: true,
               counter: 1,
-              memoTranscription: '...',
+              memoTranscription: ' ',
             };
 
-          
-            setCurrentIndex(markers.length + 1);
+            setCurrentIndex(markers.length);
             setMarkers(prevMarkers => [...prevMarkers, newMarker]);
-
-            // Adjust the carousel scrolling as needed
+            if (mapRef.current) {
+              mapRef.current.animateToRegion(newRegion);
+              console.log('Map moved to new position');
+               // Adjust the carousel scrolling as needed
             setTimeout(() => {
               if (carouselRef.current) {
                 carouselRef.current.scrollTo({
@@ -311,12 +315,9 @@ const MapViewComponent = () => {
                 });
               }
             }, 1000);
-          }
-          if (mapRef.current) {
-            mapRef.current.animateToRegion(newRegion);
-            console.log('Map moved to new position');
-          } else {
-            console.error('mapRef is null');
+            } else {
+              console.error('mapRef is null');
+            }
           }
         } catch (error) {
           console.error('Error processing position:', error);
@@ -438,6 +439,7 @@ const MapViewComponent = () => {
         setCurrentIndex={setCurrentIndex}
         currentIndex={currentIndex}
         carouselRef={carouselRef}
+        isRecording ={isRecording}
       />
     </View>
   );

@@ -1,29 +1,32 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Dimensions, Text, TouchableOpacity, Image } from 'react-native';
+import { View, Dimensions, Text, TouchableOpacity, Image, StyleSheet, Animated } from 'react-native';
 import Carousel from 'react-native-reanimated-carousel';
 
 import { useUserContext } from '../../context/UserContext';
 import { MapMarker } from '../../apis/markers';
 import { styles } from './MemosCarousel.styles';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import BouncingDots from './BouncingDots';
+
 
 interface MemosCarouselProps {
   markers: MapMarker[];
   setCurrentIndex: React.Dispatch<React.SetStateAction<number>>;
   currentIndex: number;
-  carouselRef: React.MutableRefObject<null>;
+  carouselRef: React.MutableRefObject<null>
+  isRecording: boolean;
 }
 const windowWidth = Dimensions.get('window').width;
 const MemosCarousel = (props: MemosCarouselProps) => {
   const { getAddressShort } = useUserContext();
-  const { markers, setCurrentIndex, currentIndex, carouselRef } = props;
+  const { markers, setCurrentIndex, currentIndex, carouselRef, isRecording } = props;
   const [selectedMemo, setSelectedMemo] = useState(0);
 
   useEffect(() => {
-    if (selectedMemo !== currentIndex) {
-      setSelectedMemo(currentIndex);
-    }
-  }, [currentIndex, carouselRef, selectedMemo]);
+    // if (selectedMemo !== currentIndex) {
+    //   setSelectedMemo(currentIndex);
+    // }
+  }, [currentIndex, carouselRef, selectedMemo, isRecording]);
 
   // Share Action start
   const shareAction = async () => {
@@ -51,14 +54,21 @@ const MemosCarousel = (props: MemosCarouselProps) => {
             <View style={styles.contentAction}>
               <View style={styles.transcriptionContainer}>
                 {item.memoTranscription ? (
-                  <Text numberOfLines={3} selectable={true} ellipsizeMode='tail'>
-                    <Text selectable={true} style={styles.dropCap}>
-                      {`${item.memoTranscription.charAt(0)}`}
-                    </Text>
-                    <Text selectable={true} style={[styles.transcriptionText, styles.followText]}>
-                      {`${item.memoTranscription.slice(1)}`}
-                    </Text>
-                  </Text>
+                  <View style={styles.containerDrop}>
+                    {isRecording ? (
+                      <BouncingDots />
+                    ) : (
+                      <>
+                        <Text style={styles.firstLetter}>{item.memoTranscription.charAt(0)}</Text>
+                        <View style={{ flex: 1, flexDirection: 'row', flexWrap: 'wrap' }}>
+                          {/* Conditionally render the rest of the text only if not recording */}
+                          <Text style={styles.initialText}>
+                            {item.memoTranscription.slice(1)} {/* Adjust this substring length as needed */}
+                          </Text>
+                        </View>
+                      </>
+                    )}
+                  </View>
                 ) : (
                   <Text selectable={true} style={styles.transcriptionText}>No memo transcription available</Text>
                 )}

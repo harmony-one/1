@@ -25,13 +25,11 @@ export const styles = StyleSheet.create({
     height: 175,
     width: 100,
   },
- 
+
   // New style for the container of the address and share action
   actionContainer: {
     flexDirection: 'row',
-   // justifyContent: 'space-between', // This will align `textActionAddress` to the right and `shareAction` to the left
     alignItems: 'center', // This will vertically center the contents
-   // height: 34, // Set the height you prefer
     paddingHorizontal: 10, // Add horizontal padding if needed
     justifyContent: 'flex-end',
     paddingBottom: 30,
@@ -42,8 +40,8 @@ export const styles = StyleSheet.create({
     fontSize: 17,
     color: '#00aee9',
     paddingRight: 15,
-   // lineHeight: 24,
-    fontFamily: 'Nunito', 
+    lineHeight: 24,
+    fontFamily: 'Nunito',
     // marginLeft has been removed
     // paddingRight has been removed, assuming the container padding handles this
   },
@@ -54,66 +52,61 @@ export const styles = StyleSheet.create({
     // paddingRight has been removed, assuming the container padding handles this
     height: 34, // Ensure the button has a height
     width: 34, // Ensure the button has a width
-    // Add marginLeft if you want to push the button a bit to the right from the edge
-
   },
 
   // Container for the transcription text that has a fixed height
   transcriptionContainer: {
     height: 135, // Set your fixed height here
-   // justifyContent: 'left', // Centers the text vertically within the container
-   paddingRight: 15,
+    paddingRight: 15,
   },
-  // Style for the large initial letter
-  // dropCap: {
-  //   fontSize: 56, // Set this to the size you want for the first letter
-  //   fontWeight: 'bold', // If you want the first letter to be bold
-  //   color: 'white'
-  //   // Add other styles like color, fontFamily etc. as required
-  // },
-
-  // // Style for the rest of the transcription text
-  // transcriptionText: {
-  //   fontSize: 17, // Set this to the size you want for the rest of the text
-  //   // Add other styles like color, fontFamily etc. as required
-  //   // height: 135,
-  //   color: 'white',
-  //   flexShrink: 1, // Allow text to shrink and not overflow the container
-
-  // },
-  // followText: {
-  //   marginTop: 0, // Adjust as needed to align the text with the top of the drop cap
-  //   // Additional styles as required
-  // },
-
-  // Style for the quotation mark and transcription text
-  // quotedText: {
-  //   flexDirection: 'row', // Aligns the drop cap with the rest of the text
-  //   flexWrap: 'wrap', // Ensures text wraps correctly
-  //   alignItems: 'flex-end', // Aligns the baseline of the text with the drop cap
-  // },
-
   // Style for the drop cap
   dropCap: {
     fontSize: 56, // Set this to the size you want for the first letter
+    lineHeight: 60,
     color: 'white',
-    fontFamily: 'Nunito', 
-    
+    fontFamily: 'Nunito',
+
   },
   // Style for the rest of the transcription text
   transcriptionText: {
     fontSize: 18, // Set this to the size you want for the rest of the text
     color: 'white',
-  //  flexShrink: 1, // Allow text to shrink and not overflow the container
-  //  lineHeight: 20, // Adjust this so the text aligns with the bottom of the drop cap if needed
-    // Add other styles like fontFamily etc. as required
-    fontFamily: 'Nunito', 
-    
+    fontFamily: 'Nunito',
+
   },
   // Style for the text that immediately follows the drop cap
   followText: {
     marginTop: -40, // Negative margin to pull the text up to the top of the drop cap
-    // This value will need to be adjusted depending on the font and sizes used
   },
+  containerDrop: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+  },
+  firstLetter: {
+    paddingTop: 5,
+    fontSize: 56,
+    lineHeight: 56,
+    marginRight: 4,
+    fontFamily: 'Nunito',
+    color: 'white',
+  },
+  initialText: {
+    fontSize: 18,
+    // width: '50%', // Adjust this width to control the text flow beside the drop cap
+    color: 'white',
+
+  },
+  restOfText: {
+    fontSize: 18,
+    flex: 1,
+    fontFamily: 'Nunito',
+    color: 'white',
+  },
+
+  lottie: {
+    width: 100,
+    height: 100,
+  },
+
 
 });
