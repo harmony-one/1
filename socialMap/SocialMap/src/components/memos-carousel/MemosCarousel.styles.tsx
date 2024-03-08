@@ -83,7 +83,7 @@ export const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   firstLetter: {
-    paddingTop: 5,
+   // paddingTop: 5,
     fontSize: 56,
     lineHeight: 56,
     marginRight: 4,

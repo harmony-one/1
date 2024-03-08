@@ -35,6 +35,7 @@ const MapViewComponent = () => {
   const icoonRef = useRef(null);
   // State to manage the visibility of the delete button
   const [showAlternativeButton, setShowAlternativeButton] = useState(false);
+  const [newRegion, setnewRegion] = useState < newRegion > (newRegion);
 
   useEffect(() => {
     const getMarkers = async () => {
@@ -155,7 +156,6 @@ const MapViewComponent = () => {
       return;
     }
     setIsRecording(true);
-    getCurrentLocation();
 
     const audio =
       AudioUtils.DocumentDirectoryPath + `/voiceMemo_${Date.now()}.mp4`;
@@ -167,6 +167,9 @@ const MapViewComponent = () => {
       AudioEncoding: 'aac',
     });
     await AudioRecorder.startRecording();
+
+    getCurrentLocation();
+
   };
 
   // Handle recording stop and playback
@@ -175,7 +178,7 @@ const MapViewComponent = () => {
       return;
     }
     await AudioRecorder.stopRecording();
-  
+
 
     try {
       console.log(audioPath);
@@ -183,7 +186,7 @@ const MapViewComponent = () => {
       if (result) {
         console.log('Transcription result:', result);
         setIsRecording(false);
-       
+
         // Geolocation.getCurrentPosition(
         //   async position => {
         //     // Corrected syntax for async callback
@@ -257,12 +260,14 @@ const MapViewComponent = () => {
           setShowAlternativeButton(false);
         }, 5000); // Hide alternative button after 5 seconds
 
+        mapRef.current.animateToRegion(newRegion);
+
       } else {
         Toast.show({
           type: 'error',
           text1: 'The voice memo could not be processed.',
         });
-       setIsRecording(false);
+        setIsRecording(false);
       }
     } catch (error) {
       console.error('Error processing audio:', error);
@@ -285,7 +290,7 @@ const MapViewComponent = () => {
           latitudeDelta: 0.01, // Adjust the deltas as needed
           longitudeDelta: 0.01,
         };
-
+        setnewRegion(newRegion);
         try {
           const address = await getMarkerAddress(latitude, longitude);
           if (address) {
@@ -304,17 +309,17 @@ const MapViewComponent = () => {
             setCurrentIndex(markers.length);
             setMarkers(prevMarkers => [...prevMarkers, newMarker]);
             if (mapRef.current) {
-              mapRef.current.animateToRegion(newRegion);
+
               console.log('Map moved to new position');
-               // Adjust the carousel scrolling as needed
-            setTimeout(() => {
-              if (carouselRef.current) {
-                carouselRef.current.scrollTo({
-                  index: markers.length,
-                  animated: true,
-                });
-              }
-            }, 1000);
+              // Adjust the carousel scrolling as needed
+              setTimeout(() => {
+                if (carouselRef.current) {
+                  carouselRef.current.scrollTo({
+                    index: markers.length,
+                    animated: true,
+                  });
+                }
+              }, 1000);
             } else {
               console.error('mapRef is null');
             }
@@ -365,17 +370,17 @@ const MapViewComponent = () => {
                   />
                 ))}
             </MapView>
-              {/* <View style={styles.actionButton}>
+            {/* <View style={styles.actionButton}>
                 <TouchableOpacity onPress={getCurrentLocation}>
                   <Icon name="near-me" size={25} color="#00ace8" />
                 </TouchableOpacity>
               </View> */}
-              {/* <View style={styles.actionButton}>
+            {/* <View style={styles.actionButton}>
                 <TouchableOpacity onPress={actionSheet}>
                   <Icon name="menu" size={25} color="#00ace8" />
                 </TouchableOpacity>
               </View> */}
-              {/* <View style={styles.micButton}>
+            {/* <View style={styles.micButton}>
                 <TouchableOpacity
                   onPress={() => {
                     if (isRecording) {
@@ -396,30 +401,30 @@ const MapViewComponent = () => {
             </View> */}
 
             <View style={styles.container}>
-      <View style={styles.micButton}>
-        {showAlternativeButton ? (
-          // Alternative Button
-          <TouchableOpacity onPress={() => {/* Perform action for alternative button */}}>
-            <View>
-              <Icon name="close" size={60} color="#00ace8" />
+              <View style={styles.micButton}>
+                {showAlternativeButton ? (
+                  // Alternative Button
+                  <TouchableOpacity onPress={() => {/* Perform action for alternative button */ }}>
+                    <View>
+                      <Icon name="close" size={60} color="#00ace8" />
+                    </View>
+                  </TouchableOpacity>
+                ) : (
+                  // Microphone Button
+                  <TouchableOpacity onPress={() => {
+                    if (isRecording) {
+                      stopRecordingAndPlayBack();
+                    } else {
+                      startRecording();
+                    }
+                  }}>
+                    <Animated.View style={{ opacity }}>
+                      <Icon name={isRecording ? 'mic' : 'mic-none'} size={60} color={isRecording ? 'red' : '#00ace8'} />
+                    </Animated.View>
+                  </TouchableOpacity>
+                )}
+              </View>
             </View>
-          </TouchableOpacity>
-        ) : (
-          // Microphone Button
-          <TouchableOpacity onPress={() => {
-              if (isRecording) {
-                stopRecordingAndPlayBack();
-              } else {
-                startRecording();
-              }
-            }}>
-            <Animated.View style={{ opacity }}>
-              <Icon name={isRecording ? 'mic' : 'mic-none'} size={60} color={isRecording ? 'red' : '#00ace8'} />
-            </Animated.View>
-          </TouchableOpacity>
-        )}
-      </View>
-    </View>
           </>
         ) : (
           <View>
@@ -439,7 +444,7 @@ const MapViewComponent = () => {
         setCurrentIndex={setCurrentIndex}
         currentIndex={currentIndex}
         carouselRef={carouselRef}
-        isRecording ={isRecording}
+        isRecording={isRecording}
       />
     </View>
   );

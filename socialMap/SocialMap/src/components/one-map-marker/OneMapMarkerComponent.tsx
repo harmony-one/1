@@ -1,16 +1,16 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {Marker, Callout} from 'react-native-maps';
-import {View, Text, TouchableOpacity, Animated} from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { Marker, Callout } from 'react-native-maps';
+import { View, Text, TouchableOpacity, Animated } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import {AudioRecorder, AudioUtils} from 'react-native-audio';
+import { AudioRecorder, AudioUtils } from 'react-native-audio';
 import Toast from 'react-native-toast-message';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import MapView from 'react-native-maps';
 
-import {speechToText} from '../../apis/openai';
+import { speechToText } from '../../apis/openai';
 import openInAppBrowser from '../BrowserView';
-import {styles} from './OneMapMarker.styles';
-import {type MapMarker} from '../../apis/markers';
+import { styles } from './OneMapMarker.styles';
+import { type MapMarker } from '../../apis/markers';
 
 interface MapMarkerProps {
   marker: MapMarker;
@@ -86,7 +86,7 @@ const OneMapMarker = (props: MapMarkerProps) => {
 
   useEffect(() => {
     if (currentIndex === marker.id - 1 && mapRef.current) {
-      const {latitude, longitude} = marker;
+      const { latitude, longitude } = marker;
       // @ts-ignore
       if (mapRef.current) {
         (mapRef.current as MapView).animateToRegion(
@@ -121,11 +121,11 @@ const OneMapMarker = (props: MapMarkerProps) => {
           prevMarkers.map(m =>
             m.id === marker.id
               ? {
-                  ...m,
-                  memoTranscription: m.memoTranscription
-                    ? `${m.memoTranscription}\n${result}`
-                    : result,
-                }
+                ...m,
+                memoTranscription: m.memoTranscription
+                  ? `${m.memoTranscription}\n${result}`
+                  : result,
+              }
               : m,
           ),
         );
@@ -166,16 +166,16 @@ const OneMapMarker = (props: MapMarkerProps) => {
         latitude: marker.latitude,
         longitude: marker.longitude,
       }}
-      // title={marker.name}
-      // description={marker.address}
-      
-      >
+    // title={marker.name}
+    // description={marker.address}
+
+    >
       <View style={styles.circle}>
         <LinearGradient
           colors={['#00AEE9', '#FFFFFF']} // Replace with your gradient colors
           style={styles.circle}
-          start={{x: 0, y: 0}} // Gradient starting position
-          end={{x: 1, y: 1}} // Gradient ending position
+          start={{ x: 0, y: 0 }} // Gradient starting position
+          end={{ x: 1, y: 1 }} // Gradient ending position
         >
           <Text style={styles.number}>{marker.id}</Text>
         </LinearGradient>
