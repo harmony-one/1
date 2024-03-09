@@ -1,4 +1,4 @@
-import { StyleSheet, Dimensions } from 'react-native';
+import {StyleSheet, Dimensions} from 'react-native';
 
 const windowWidth = Dimensions.get('window').width;
 // const windowHeight = Dimensions.get('window').height;
@@ -65,14 +65,12 @@ export const styles = StyleSheet.create({
     lineHeight: 60,
     color: 'white',
     fontFamily: 'Nunito',
-
   },
   // Style for the rest of the transcription text
   transcriptionText: {
     fontSize: 18, // Set this to the size you want for the rest of the text
     color: 'white',
     fontFamily: 'Nunito',
-
   },
   // Style for the text that immediately follows the drop cap
   followText: {
@@ -83,7 +81,7 @@ export const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   firstLetter: {
-   // paddingTop: 5,
+    // paddingTop: 5,
     fontSize: 56,
     lineHeight: 56,
     marginRight: 4,
@@ -94,7 +92,6 @@ export const styles = StyleSheet.create({
     fontSize: 18,
     // width: '50%', // Adjust this width to control the text flow beside the drop cap
     color: 'white',
-
   },
   restOfText: {
     fontSize: 18,
@@ -107,6 +104,4 @@ export const styles = StyleSheet.create({
     width: 100,
     height: 100,
   },
-
-
 });

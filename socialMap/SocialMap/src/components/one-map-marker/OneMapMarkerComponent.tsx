@@ -1,16 +1,16 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Marker, Callout } from 'react-native-maps';
-import { View, Text, TouchableOpacity, Animated } from 'react-native';
+import React, {useEffect, useRef} from 'react';
+import {Marker} from 'react-native-maps';
+import {View, Text, Animated} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import { AudioRecorder, AudioUtils } from 'react-native-audio';
-import Toast from 'react-native-toast-message';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+// import {AudioRecorder, AudioUtils} from 'react-native-audio';
+// import Toast from 'react-native-toast-message';
+// import Icon from 'react-native-vector-icons/MaterialIcons';
 import MapView from 'react-native-maps';
 
-import { speechToText } from '../../apis/openai';
-import openInAppBrowser from '../BrowserView';
-import { styles } from './OneMapMarker.styles';
-import { type MapMarker } from '../../apis/markers';
+// import {speechToText} from '../../apis/openai';
+// import openInAppBrowser from '../BrowserView';
+import {styles} from './OneMapMarker.styles';
+import {type MapMarker} from '../../apis/markers';
 
 interface MapMarkerProps {
   marker: MapMarker;
@@ -22,40 +22,40 @@ interface MapMarkerProps {
   currentIndex: number;
 }
 
-function sanitizeURL(str: string) {
-  return str.replace(/[^a-zA-Z0-9\-_.!~*'()]/g, '');
-}
+// function sanitizeURL(str: string) {
+//   return str.replace(/[^a-zA-Z0-9\-_.!~*'()]/g, '');
+// }
 
 const OneMapMarker = (props: MapMarkerProps) => {
   const {
     marker,
     isRecording,
-    setIsRecording,
-    setMarkers,
-    hasPermission,
+    // setIsRecording,
+    // setMarkers,
+    // hasPermission,
     mapRef,
     currentIndex,
   } = props;
-  const [audioPath, setAudioPath] = useState(
-    AudioUtils.DocumentDirectoryPath + `/voiceMemo_${Date.now()}.mp4`,
-  );
+  // const [audioPath, setAudioPath] = useState(
+  //   AudioUtils.DocumentDirectoryPath + `/voiceMemo_${Date.now()}.mp4`,
+  // );
   const opacity = useRef(new Animated.Value(1)).current;
 
-  const handlePress = () => {
-    console.log('Button pressed for:', marker.name);
+  // const handlePress = () => {
+  //   console.log('Button pressed for:', marker.name);
 
-    const newRegion = {
-      latitude: marker.latitude,
-      longitude: marker.longitude,
-      latitudeDelta: 0.01,
-      longitudeDelta: 0.01,
-    };
-    if (mapRef.current) {
-      (mapRef.current as MapView).animateToRegion(newRegion);
-    } else {
-      console.error('mapRef is null');
-    } // Added duration for the animation
-  };
+  //   const newRegion = {
+  //     latitude: marker.latitude,
+  //     longitude: marker.longitude,
+  //     latitudeDelta: 0.01,
+  //     longitudeDelta: 0.01,
+  //   };
+  //   if (mapRef.current) {
+  //     (mapRef.current as MapView).animateToRegion(newRegion);
+  //   } else {
+  //     console.error('mapRef is null');
+  //   } // Added duration for the animation
+  // };
 
   useEffect(() => {
     const blinkAnimation = Animated.loop(
@@ -86,7 +86,7 @@ const OneMapMarker = (props: MapMarkerProps) => {
 
   useEffect(() => {
     if (currentIndex === marker.id - 1 && mapRef.current) {
-      const { latitude, longitude } = marker;
+      const {latitude, longitude} = marker;
       // @ts-ignore
       if (mapRef.current) {
         (mapRef.current as MapView).animateToRegion(
@@ -105,59 +105,59 @@ const OneMapMarker = (props: MapMarkerProps) => {
   }, [currentIndex, marker, mapRef]);
 
   // Handle recording stop and playback
-  const stopRecordingAndPlayBackEventPopup = async () => {
-    if (!isRecording) {
-      return;
-    }
-    await AudioRecorder.stopRecording();
-    setIsRecording(false);
-    // Playback the recording
-    try {
-      console.log(audioPath);
-      const result = await speechToText(audioPath);
-      if (result) {
-        console.log('Transcription result:', result);
-        setMarkers(prevMarkers =>
-          prevMarkers.map(m =>
-            m.id === marker.id
-              ? {
-                ...m,
-                memoTranscription: m.memoTranscription
-                  ? `${m.memoTranscription}\n${result}`
-                  : result,
-              }
-              : m,
-          ),
-        );
-      } else {
-        Toast.show({
-          type: 'error',
-          text1: 'The voice memo could not be processed',
-        });
-      }
-    } catch (error) {
-      console.error('Error processing audio:', error);
-    }
-  };
+  // const stopRecordingAndPlayBackEventPopup = async () => {
+  //   if (!isRecording) {
+  //     return;
+  //   }
+  //   await AudioRecorder.stopRecording();
+  //   setIsRecording(false);
+  //   // Playback the recording
+  //   try {
+  //     console.log(audioPath);
+  //     const result = await speechToText(audioPath);
+  //     if (result) {
+  //       console.log('Transcription result:', result);
+  //       setMarkers(prevMarkers =>
+  //         prevMarkers.map(m =>
+  //           m.id === marker.id
+  //             ? {
+  //                 ...m,
+  //                 memoTranscription: m.memoTranscription
+  //                   ? `${m.memoTranscription}\n${result}`
+  //                   : result,
+  //               }
+  //             : m,
+  //         ),
+  //       );
+  //     } else {
+  //       Toast.show({
+  //         type: 'error',
+  //         text1: 'The voice memo could not be processed',
+  //       });
+  //     }
+  //   } catch (error) {
+  //     console.error('Error processing audio:', error);
+  //   }
+  // };
 
   // Handle recording start
-  const startRecordingEventPopup = async () => {
-    if (!hasPermission) {
-      console.warn("Can't record, no permission granted!");
-      return;
-    }
-    setIsRecording(true);
-    const audio =
-      AudioUtils.DocumentDirectoryPath + `/voiceMemo_${Date.now()}.mp4`;
-    setAudioPath(audio);
-    AudioRecorder.prepareRecordingAtPath(audio, {
-      SampleRate: 22050,
-      Channels: 1,
-      AudioQuality: 'High',
-      AudioEncoding: 'aac',
-    });
-    await AudioRecorder.startRecording();
-  };
+  // const startRecordingEventPopup = async () => {
+  //   if (!hasPermission) {
+  //     console.warn("Can't record, no permission granted!");
+  //     return;
+  //   }
+  //   setIsRecording(true);
+  //   const audio =
+  //     AudioUtils.DocumentDirectoryPath + `/voiceMemo_${Date.now()}.mp4`;
+  //   setAudioPath(audio);
+  //   AudioRecorder.prepareRecordingAtPath(audio, {
+  //     SampleRate: 22050,
+  //     Channels: 1,
+  //     AudioQuality: 'High',
+  //     AudioEncoding: 'aac',
+  //   });
+  //   await AudioRecorder.startRecording();
+  // };
 
   return (
     <Marker
@@ -166,16 +166,15 @@ const OneMapMarker = (props: MapMarkerProps) => {
         latitude: marker.latitude,
         longitude: marker.longitude,
       }}
-    // title={marker.name}
-    // description={marker.address}
-
+      // title={marker.name}
+      // description={marker.address}
     >
       <View style={styles.circle}>
         <LinearGradient
           colors={['#00AEE9', '#FFFFFF']} // Replace with your gradient colors
           style={styles.circle}
-          start={{ x: 0, y: 0 }} // Gradient starting position
-          end={{ x: 1, y: 1 }} // Gradient ending position
+          start={{x: 0, y: 0}} // Gradient starting position
+          end={{x: 1, y: 1}} // Gradient ending position
         >
           <Text style={styles.number}>{marker.id}</Text>
         </LinearGradient>

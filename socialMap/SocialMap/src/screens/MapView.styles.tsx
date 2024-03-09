@@ -36,6 +36,6 @@ export const styles = StyleSheet.create({
     backgroundColor: 'white', // Set the background color (optional)
     borderRadius: 50, // Round the corners (optional)
     height: 80,
-    width: 80
+    width: 80,
   },
 });

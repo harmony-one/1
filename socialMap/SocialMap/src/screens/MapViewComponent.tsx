@@ -1,25 +1,31 @@
 // MapViewComponent.jsx
-import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, TouchableOpacity, Alert, Animated } from 'react-native';
+import React, {useEffect, useRef, useState} from 'react';
+import {View, Text, TouchableOpacity, Alert, Animated} from 'react-native';
 import MapView from 'react-native-maps';
-import { AudioRecorder, AudioUtils } from 'react-native-audio';
+import {AudioRecorder, AudioUtils} from 'react-native-audio';
 import Toast from 'react-native-toast-message';
 import Geolocation from '@react-native-community/geolocation';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import firestore from '@react-native-firebase/firestore';
 
-import { speechToText } from '../apis/openai';
-import { type MapMarker, getMapMarkers } from '../apis/markers';
-import { getMarkerAddress } from '../apis/geocoding';
+import {speechToText} from '../apis/openai';
+import {type MapMarker, getMapMarkers} from '../apis/markers';
+import {getMarkerAddress} from '../apis/geocoding';
 
-import ImageCarousel from '../components/image-carousel/ImageCarouselComponent';
+// import ImageCarousel from '../components/image-carousel/ImageCarouselComponent';
 import MemosCarousel from '../components/memos-carousel/MemosCarouselComponent';
 import OneMapMarker from '../components/one-map-marker/OneMapMarkerComponent';
-import { styles } from './MapView.styles';
+import {styles} from './MapView.styles';
 
+interface Region {
+  latitude: number;
+  longitude: number;
+  latitudeDelta: number; // Adjust the deltas as needed
+  longitudeDelta: number;
+}
 const MapViewComponent = () => {
   // State for managing recording
-  const [markers, setMarkers] = useState < MapMarker[] > ([]);
+  const [markers, setMarkers] = useState<MapMarker[]>([]);
   const [isRecording, setIsRecording] = useState(false);
   const [hasPermission, setHasPermission] = useState(false);
   const [, setMarkerCounts] = useState({});
@@ -32,10 +38,10 @@ const MapViewComponent = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const opacity = useRef(new Animated.Value(1)).current; // For opacity animation
   const carouselRef = useRef(null);
-  const icoonRef = useRef(null);
+  // const icoonRef = useRef(null);
   // State to manage the visibility of the delete button
   const [showAlternativeButton, setShowAlternativeButton] = useState(false);
-  const [newRegion, setnewRegion] = useState < newRegion > (newRegion);
+  const [newRegion, setnewRegion] = useState<Region>();
 
   useEffect(() => {
     const getMarkers = async () => {
@@ -71,10 +77,9 @@ const MapViewComponent = () => {
     const updatedCount = markers.length;
     const latestData = markers[updatedCount - 1];
 
-    console.log("Updated markers count:", updatedCount);
-    console.log("Latest marker data:", latestData);
+    console.log('Updated markers count:', updatedCount);
+    console.log('Latest marker data:', latestData);
     // Perform actions with the updated count and latest data here
-
   }, [markers]); // This
 
   useEffect(() => {
@@ -82,7 +87,7 @@ const MapViewComponent = () => {
       (mapRef.current as MapView).fitToSuppliedMarkers(
         markers.map(marker => `${marker.id}`),
         {
-          edgePadding: { top: 50, right: 50, bottom: 50, left: 50 },
+          edgePadding: {top: 50, right: 50, bottom: 50, left: 50},
           animated: true,
         },
       );
@@ -94,7 +99,7 @@ const MapViewComponent = () => {
       if (!markers || markers.length === 0) {
         return;
       }
-      const countsMap: { [key: string]: number } = {};
+      const countsMap: {[key: string]: number} = {};
       const fetchPromises = markers.map(marker => {
         const documentId = `${marker.longitude}${marker.latitude}`;
         return firestore()
@@ -169,7 +174,6 @@ const MapViewComponent = () => {
     await AudioRecorder.startRecording();
 
     getCurrentLocation();
-
   };
 
   // Handle recording stop and playback
@@ -178,15 +182,12 @@ const MapViewComponent = () => {
       return;
     }
     await AudioRecorder.stopRecording();
-
-
+    setIsRecording(false);
     try {
       console.log(audioPath);
       const result = await speechToText(audioPath); // Assuming this function exists and works as expected
       if (result) {
         console.log('Transcription result:', result);
-        setIsRecording(false);
-
         // Geolocation.getCurrentPosition(
         //   async position => {
         //     // Corrected syntax for async callback
@@ -233,7 +234,6 @@ const MapViewComponent = () => {
         //       });
         //     }, 1000); // Adjust the delay as needed
 
-
         //   },
         //   error => {
         //     console.error('Error getting current position:', error);
@@ -246,11 +246,9 @@ const MapViewComponent = () => {
           prevMarkers.map(m =>
             m.id === markers.length
               ? {
-                ...m,
-                memoTranscription: m.memoTranscription
-                  ? `${result}`
-                  : result,
-              }
+                  ...m,
+                  memoTranscription: m.memoTranscription ? `${result}` : result,
+                }
               : m,
           ),
         );
@@ -259,9 +257,9 @@ const MapViewComponent = () => {
         setTimeout(() => {
           setShowAlternativeButton(false);
         }, 5000); // Hide alternative button after 5 seconds
-
-        mapRef.current.animateToRegion(newRegion);
-
+        if (mapRef.current && newRegion) {
+          (mapRef.current as MapView).animateToRegion(newRegion);
+        }
       } else {
         Toast.show({
           type: 'error',
@@ -281,16 +279,17 @@ const MapViewComponent = () => {
 
   const getCurrentLocation = () => {
     Geolocation.getCurrentPosition(
-      async position => { // Convert the callback to an async function
+      async position => {
+        // Convert the callback to an async function
         console.log('Current position:', position);
-        const { latitude, longitude } = position.coords;
-        const newRegion = {
+        const {latitude, longitude} = position.coords;
+        const newCurrentRegion = {
           latitude,
           longitude,
           latitudeDelta: 0.01, // Adjust the deltas as needed
           longitudeDelta: 0.01,
         };
-        setnewRegion(newRegion);
+        setnewRegion(newCurrentRegion);
         try {
           const address = await getMarkerAddress(latitude, longitude);
           if (address) {
@@ -309,12 +308,11 @@ const MapViewComponent = () => {
             setCurrentIndex(markers.length);
             setMarkers(prevMarkers => [...prevMarkers, newMarker]);
             if (mapRef.current) {
-
               console.log('Map moved to new position');
               // Adjust the carousel scrolling as needed
               setTimeout(() => {
                 if (carouselRef.current) {
-                  carouselRef.current.scrollTo({
+                  (carouselRef.current as any).scrollTo({
                     index: markers.length,
                     animated: true,
                   });
@@ -324,7 +322,7 @@ const MapViewComponent = () => {
               console.error('mapRef is null');
             }
           }
-        } catch (error) {
+        } catch (error: any) {
           console.error('Error processing position:', error);
           Alert.alert('Error', error.message);
         }
@@ -333,10 +331,9 @@ const MapViewComponent = () => {
         console.error('Error getting current position:', error);
         Alert.alert('Error', error.message);
       },
-      { enableHighAccuracy: true },
+      {enableHighAccuracy: true},
     );
   };
-
 
   return (
     <View style={styles.container}>
@@ -404,22 +401,30 @@ const MapViewComponent = () => {
               <View style={styles.micButton}>
                 {showAlternativeButton ? (
                   // Alternative Button
-                  <TouchableOpacity onPress={() => {/* Perform action for alternative button */ }}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      /* Perform action for alternative button */
+                    }}>
                     <View>
                       <Icon name="close" size={60} color="#00ace8" />
                     </View>
                   </TouchableOpacity>
                 ) : (
                   // Microphone Button
-                  <TouchableOpacity onPress={() => {
-                    if (isRecording) {
-                      stopRecordingAndPlayBack();
-                    } else {
-                      startRecording();
-                    }
-                  }}>
-                    <Animated.View style={{ opacity }}>
-                      <Icon name={isRecording ? 'mic' : 'mic-none'} size={60} color={isRecording ? 'red' : '#00ace8'} />
+                  <TouchableOpacity
+                    onPress={() => {
+                      if (isRecording) {
+                        stopRecordingAndPlayBack();
+                      } else {
+                        startRecording();
+                      }
+                    }}>
+                    <Animated.View style={{opacity}}>
+                      <Icon
+                        name={isRecording ? 'mic' : 'mic-none'}
+                        size={60}
+                        color={isRecording ? 'red' : '#00ace8'}
+                      />
                     </Animated.View>
                   </TouchableOpacity>
                 )}
