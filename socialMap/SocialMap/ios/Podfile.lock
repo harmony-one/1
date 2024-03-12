@@ -1851,6 +1851,8 @@ PODS:
     - React-perflogger (= 0.73.4)
   - RNAudio (4.3.0):
     - React
+  - RNAudioRecord (1.0.1):
+    - React
   - RNAudioRecorderPlayer (3.6.6):
     - React-Core
   - RNCClipboard (1.13.2):
@@ -1961,6 +1963,7 @@ DEPENDENCIES:
   - React-utils (from `../node_modules/react-native/ReactCommon/react/utils`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
   - RNAudio (from `../node_modules/react-native-audio`)
+  - RNAudioRecord (from `../node_modules/react-native-audio-recording-stream`)
   - RNAudioRecorderPlayer (from `../node_modules/react-native-audio-recorder-player`)
   - "RNCClipboard (from `../node_modules/@react-native-clipboard/clipboard`)"
   - "RNCMaskedView (from `../node_modules/@react-native-community/masked-view`)"
@@ -2127,6 +2130,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon"
   RNAudio:
     :path: "../node_modules/react-native-audio"
+  RNAudioRecord:
+    :path: "../node_modules/react-native-audio-recording-stream"
   RNAudioRecorderPlayer:
     :path: "../node_modules/react-native-audio-recorder-player"
   RNCClipboard:
@@ -2241,6 +2246,7 @@ SPEC CHECKSUMS:
   React-utils: 21a798438d45e70ed9c2e2fe0894ee32ba7b7c5b
   ReactCommon: dcc65c813041388dead6c8b477444757425ce961
   RNAudio: cae2991f2dccb75163f260b60da8051717b959fa
+  RNAudioRecord: a4c489d05444ae187e7ee8b466c3f81906f2fbee
   RNAudioRecorderPlayer: f790fc1afb118552ae6285d60adde52ee6b5d9ef
   RNCClipboard: 60fed4b71560d7bfe40e9d35dea9762b024da86d
   RNCMaskedView: 0e1bc4bfa8365eba5fbbb71e07fbdc0555249489
