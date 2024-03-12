@@ -8,7 +8,6 @@ import Geolocation from '@react-native-community/geolocation';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import firestore from '@react-native-firebase/firestore';
 
-import {speechToText} from '../apis/openai';
 import {type MapMarker, getMapMarkers} from '../apis/markers';
 import {getMarkerAddress} from '../apis/geocoding';
 
@@ -16,6 +15,8 @@ import {getMarkerAddress} from '../apis/geocoding';
 import MemosCarousel from '../components/memos-carousel/MemosCarouselComponent';
 import OneMapMarker from '../components/one-map-marker/OneMapMarkerComponent';
 import {styles} from './MapView.styles';
+import { speechToText, cancelCurrentSpeechToTextOperation } from '../apis/openai'; // Adjust the import path as necessary
+
 
 interface Region {
   latitude: number;
@@ -42,6 +43,8 @@ const MapViewComponent = () => {
   // State to manage the visibility of the delete button
   const [showAlternativeButton, setShowAlternativeButton] = useState(false);
   const [newRegion, setnewRegion] = useState<Region>();
+
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     const getMarkers = async () => {
@@ -185,6 +188,7 @@ const MapViewComponent = () => {
     setIsRecording(false);
     try {
       console.log(audioPath);
+      
       const result = await speechToText(audioPath); // Assuming this function exists and works as expected
       if (result) {
         console.log('Transcription result:', result);
@@ -254,6 +258,7 @@ const MapViewComponent = () => {
         );
 
         setShowAlternativeButton(true);
+        setIsDeleting(true);
         setTimeout(() => {
           setShowAlternativeButton(false);
         }, 5000); // Hide alternative button after 5 seconds
@@ -276,6 +281,15 @@ const MapViewComponent = () => {
       setIsRecording(false);
     }
   };
+
+  const deleteCurrent = () => {
+    if (isDeleting) {
+      setMarkers(prevMarkers => prevMarkers.slice(0, -1));
+      setIsDeleting(false);
+      setShowAlternativeButton(false);
+      cancelCurrentSpeechToTextOperation();
+    }
+  }
 
   const getCurrentLocation = () => {
     Geolocation.getCurrentPosition(
@@ -403,7 +417,8 @@ const MapViewComponent = () => {
                   // Alternative Button
                   <TouchableOpacity
                     onPress={() => {
-                      /* Perform action for alternative button */
+                     
+                      deleteCurrent();
                     }}>
                     <View>
                       <Icon name="close" size={60} color="#00ace8" />

@@ -68,7 +68,7 @@ const MemosCarousel = (props: MemosCarouselProps) => {
                     ) : (
                       <>
                         <Text style={styles.firstLetter}>
-                          {item.memoTranscription.charAt(0)}
+                          {item.memoTranscription.charAt(0).toUpperCase()}
                         </Text>
                         <View
                           style={{
@@ -87,7 +87,7 @@ const MemosCarousel = (props: MemosCarouselProps) => {
                   </View>
                 ) : (
                   <Text selectable={true} style={styles.transcriptionText}>
-                    No memo transcription available
+                  No memo transcription available
                   </Text>
                 )}
               </View>
