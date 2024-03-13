@@ -86,15 +86,19 @@ const MapViewComponent = () => {
   }, [markers]); // This
 
   useEffect(() => {
-    if (markers && mapRef.current) {
-      (mapRef.current as MapView).fitToSuppliedMarkers(
-        markers.map(marker => `${marker.id}`),
-        {
-          edgePadding: {top: 50, right: 50, bottom: 50, left: 50},
-          animated: true,
-        },
-      );
-    }
+    const debouncedFitMarkers = debounce(() => {
+      if (mapRef.current) {
+        mapRef.current.fitToSuppliedMarkers(
+          markers.map(marker => `${marker.id}`),
+          {
+            edgePadding: { top: 50, right: 50, bottom: 50, left: 50 },
+            animated: true,
+          },
+        );
+      }
+    }, 500); // Adjust debounce time as needed
+  
+    debouncedFitMarkers();
   }, [markers]);
 
   useEffect(() => {
@@ -130,6 +134,19 @@ const MapViewComponent = () => {
 
     fetchCounts();
   }, [markers]);
+
+  function debounce(func, wait, immediate) {
+    let timeout;
+    return function() {
+      const context = this, args = arguments;
+      clearTimeout(timeout);
+      timeout = setTimeout(function() {
+        timeout = null;
+        if (!immediate) func.apply(context, args);
+      }, wait);
+      if (immediate && !timeout) func.apply(context, args);
+    };
+  }
 
   // Animation for blinking effect
   useEffect(() => {
@@ -174,103 +191,56 @@ const MapViewComponent = () => {
       AudioQuality: 'High',
       AudioEncoding: 'aac',
     });
+    getCurrentLocation();
+
     await AudioRecorder.startRecording();
 
-    getCurrentLocation();
   };
-
-  // Handle recording stop and playback
+  
   const stopRecordingAndPlayBack = async () => {
     if (!isRecording) {
-      return;
+      return; // Early return if not recording to avoid unnecessary processing
     }
-    await AudioRecorder.stopRecording();
-    setIsRecording(false);
     try {
-      console.log(audioPath);
-      
-      const result = await speechToText(audioPath); // Assuming this function exists and works as expected
+      await AudioRecorder.stopRecording();
+      setIsRecording(false); // Update recording state early to reflect UI changes promptly
+      const result = await speechToText(audioPath);
       if (result) {
         console.log('Transcription result:', result);
-        // Geolocation.getCurrentPosition(
-        //   async position => {
-        //     // Corrected syntax for async callback
-        //     console.log('Current position:', position);
-        //     const { latitude, longitude } = position.coords;
-        //     const newRegion = {
-        //       latitude,
-        //       longitude,
-        //       latitudeDelta: 0.01, // Optionally adjust the latitudeDelta and longitudeDelta
-        //       longitudeDelta: 0.01,
-        //     };
 
-        //     const address = await getMarkerAddress(latitude, longitude); // Make sure this function is correctly defined
-        //     if (address) {
-        //       console.log('Current address:', address);
-        //       const newMarker = {
-        //         //    id: uuid.v4(), // Ensure uuid.v4() is correctly imported and used
-        //         id: markers ? markers.length + 1 : 1,
-        //         name: 'New Marker', // Changed from uuid to a descriptive name
-        //         longitude: longitude,
-        //         latitude: latitude,
-        //         address: address.split(',')[0],
-        //         checked: true,
-        //         counter: 1,
-        //         memoTranscription: result,
-        //       };
-
-        //       setMarkers((prevMarkers: MapMarker[]) => [
-        //         ...prevMarkers,
-        //         newMarker,
-        //       ]);
-        //       setCurrentIndex(markers ? markers.length + 1 : 1);
-        //       if (mapRef.current) {
-        //         (mapRef.current as MapView).animateToRegion(newRegion);
-        //         console.log('map moved tor');
-        //       } else {
-        //         console.error('mapRef is null');
-        //       }
-        //     }
-        //     setTimeout(() => {
-        //       (carouselRef.current as any).scrollTo({
-        //         index: markers.length,
-        //         animated: true,
-        //       });
-        //     }, 1000); // Adjust the delay as needed
-
-        //   },
-        //   error => {
-        //     console.error('Error getting current position:', error);
-        //     Alert.alert('Error', 'Unable to fetch current location.');
-        //   },
-        //   { enableHighAccuracy: true },
-        // );
+        if (result === 'Thank you for watching') {
+          // Specific check for a certain transcription result
+          Toast.show({
+            type: 'error',
+            text1: 'The voice memo could not be processed.',
+          });
+          return; // Early return to stop further execution
+        }
 
         setMarkers(prevMarkers =>
-          prevMarkers.map(m =>
-            m.id === markers.length
-              ? {
-                  ...m,
-                  memoTranscription: m.memoTranscription ? `${result}` : result,
-                }
-              : m,
+          prevMarkers.map(marker =>
+            marker.id === markers.length ? { ...marker, memoTranscription: result } : marker
           ),
         );
-
+  
         setShowAlternativeButton(true);
         setIsDeleting(true);
         setTimeout(() => {
-          setShowAlternativeButton(false);
-        }, 5000); // Hide alternative button after 5 seconds
-        if (mapRef.current && newRegion) {
-          (mapRef.current as MapView).animateToRegion(newRegion);
-        }
+          setShowAlternativeButton(false); // Use a callback to ensure state is managed correctly over time
+        }, 5000); // Hide alternative button after a brief period
+  
+        setTimeout(() => {
+          if (mapRef.current) {
+            console.log('Current stopRecordingAndPlayBack region :', newRegion);
+            mapRef.current.animateToRegion(newRegion); // Adjust duration for the animation as needed
+          }
+        }, 1000); // A slight delay ensures the map is ready for the animation
+
       } else {
         Toast.show({
           type: 'error',
           text1: 'The voice memo could not be processed.',
         });
-        setIsRecording(false);
       }
     } catch (error) {
       console.error('Error processing audio:', error);
@@ -278,12 +248,14 @@ const MapViewComponent = () => {
         type: 'error',
         text1: 'Error processing audio.',
       });
-      setIsRecording(false);
+    } finally {
+      setIsRecording(false); // Ensure recording state is updated regardless of outcome
     }
   };
-
+  
   const deleteCurrent = () => {
     if (isDeleting) {
+      console.log('Delete Current position');
       setMarkers(prevMarkers => prevMarkers.slice(0, -1));
       setIsDeleting(false);
       setShowAlternativeButton(false);
@@ -291,64 +263,61 @@ const MapViewComponent = () => {
     }
   }
 
-  const getCurrentLocation = () => {
-    Geolocation.getCurrentPosition(
-      async position => {
-        // Convert the callback to an async function
-        console.log('Current position:', position);
-        const {latitude, longitude} = position.coords;
-        const newCurrentRegion = {
-          latitude,
+  const getCurrentLocation = async () => {
+    const getPosition = () => {
+      return new Promise((resolve, reject) => {
+        Geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: true });
+      });
+    };
+  
+    try {
+      const position = await getPosition();
+      console.log('Current position:', position);
+      const { latitude, longitude } = position.coords;
+  
+      const newCurrentRegion = {
+        latitude,
+        longitude,
+        latitudeDelta: 0.01, // Adjust as needed
+        longitudeDelta: 0.01,
+      };
+      setnewRegion(newCurrentRegion);
+      // Delay the animation slightly to ensure everything is ready
+      const address = await getMarkerAddress(latitude, longitude);
+      if (address) {
+        console.log('Current address:', address);
+        const newMarker = {
+          id: markers ? markers.length + 1 : 1, // Assume markers is accessible
+          name: 'New Marker',
           longitude,
-          latitudeDelta: 0.01, // Adjust the deltas as needed
-          longitudeDelta: 0.01,
+          latitude,
+          address: address.split(',')[0],
+          checked: true,
+          counter: 1,
+          memoTranscription: ' ',
         };
-        setnewRegion(newCurrentRegion);
-        try {
-          const address = await getMarkerAddress(latitude, longitude);
-          if (address) {
-            console.log('Current address:', address);
-            const newMarker = {
-              id: markers ? markers.length + 1 : 1, // Assume markers is accessible
-              name: 'New Marker',
-              longitude: longitude,
-              latitude: latitude,
-              address: address.split(',')[0],
-              checked: true,
-              counter: 1,
-              memoTranscription: ' ',
-            };
 
-            setCurrentIndex(markers.length);
-            setMarkers(prevMarkers => [...prevMarkers, newMarker]);
-            if (mapRef.current) {
-              console.log('Map moved to new position');
-              // Adjust the carousel scrolling as needed
-              setTimeout(() => {
-                if (carouselRef.current) {
-                  (carouselRef.current as any).scrollTo({
-                    index: markers.length,
-                    animated: true,
-                  });
-                }
-              }, 1000);
-            } else {
-              console.error('mapRef is null');
-            }
+        setCurrentIndex(markers.length);
+        setMarkers(prevMarkers => [...prevMarkers, newMarker]);
+
+        setTimeout(() => {
+          if (mapRef.current) {
+            console.log('Current newCurrentRegion:', newCurrentRegion);
+            mapRef.current.animateToRegion(newCurrentRegion, 1000); // Adjust duration for the animation as needed
+            carouselRef.current?.scrollTo({
+              index: markers.length,
+              animated: true,
+            });
           }
-        } catch (error: any) {
-          console.error('Error processing position:', error);
-          Alert.alert('Error', error.message);
-        }
-      },
-      error => {
-        console.error('Error getting current position:', error);
-        Alert.alert('Error', error.message);
-      },
-      {enableHighAccuracy: true},
-    );
+        }, 100); // A slight delay ensures the map is ready for the animation
+    
+      }
+    } catch (error) {
+      console.error('Error processing position:', error);
+      Alert.alert('Error', error.message || 'An error occurred');
+    }
   };
-
+  
   return (
     <View style={styles.container}>
       <View style={styles.mapContainer}>

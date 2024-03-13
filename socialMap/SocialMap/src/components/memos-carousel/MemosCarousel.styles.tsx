@@ -94,7 +94,7 @@ export const styles = StyleSheet.create({
     fontSize: 18,
     // width: '50%', // Adjust this width to control the text flow beside the drop cap
     color: 'white',
-
+    fontFamily: 'Nunito',
   },
   restOfText: {
     fontSize: 18,
