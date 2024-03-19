@@ -34,6 +34,17 @@ export const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     paddingBottom: 30,
   },
+
+   // Container for the transcription text that has a fixed height
+   transcriptionContainer: {
+    height: 135, // Set your fixed height here
+    paddingRight: 15,
+  },
+
+  containerDrop: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+  },
   // Updated `textActionAddress` style
   textActionAddress: {
     // flexGrow has been removed
@@ -41,7 +52,7 @@ export const styles = StyleSheet.create({
     color: '#00aee9',
     paddingRight: 15,
     lineHeight: 24,
-    fontFamily: 'Nunito',
+    fontFamily: 'Nunito-Regular',
     // marginLeft has been removed
     // paddingRight has been removed, assuming the container padding handles this
   },
@@ -54,17 +65,13 @@ export const styles = StyleSheet.create({
     width: 34, // Ensure the button has a width
   },
 
-  // Container for the transcription text that has a fixed height
-  transcriptionContainer: {
-    height: 135, // Set your fixed height here
-    paddingRight: 15,
-  },
+ 
   // Style for the drop cap
   dropCap: {
-    fontSize: 56, // Set this to the size you want for the first letter
-    lineHeight: 60,
+    fontSize: 30, // Set this to the size you want for the first letter
+    lineHeight: 34,
     color: 'white',
-    fontFamily: 'Nunito',
+    fontFamily: 'Nunito-Regular',
     paddingTop: 5
 
   },
@@ -72,42 +79,13 @@ export const styles = StyleSheet.create({
   transcriptionText: {
     fontSize: 18, // Set this to the size you want for the rest of the text
     color: 'white',
-    fontFamily: 'Nunito',
+    fontFamily: 'Nunito-Regular',
 
   },
-  // Style for the text that immediately follows the drop cap
-  followText: {
-    marginTop: -40, // Negative margin to pull the text up to the top of the drop cap
-  },
-  containerDrop: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-  },
-  firstLetter: {
-    fontSize: 56,
-    lineHeight: 56,
-   // marginRight: 4,
-    fontFamily: 'Nunito',
-    color: 'white',
-  },
-  initialText: {
-    fontSize: 18,
-    // width: '50%', // Adjust this width to control the text flow beside the drop cap
-    color: 'white',
-    fontFamily: 'Nunito',
-  },
-  restOfText: {
-    fontSize: 18,
-    flex: 1,
-    fontFamily: 'Nunito',
-    color: 'white',
-    marginTop: 10
-  },
-
-  lottie: {
-    width: 100,
-    height: 100,
-  },
-
+  container: {
+   // flex: 1,
+   height: 130,
+    paddingBottom: 10,
+  }
 
 });

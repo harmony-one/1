@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Dimensions,
@@ -12,10 +12,12 @@ import {
 import Carousel from 'react-native-reanimated-carousel';
 
 // import {useUserContext} from '../../context/UserContext';
-import {MapMarker} from '../../apis/markers';
-import {styles} from './MemosCarousel.styles';
+import { MapMarker } from '../../apis/markers';
+import { styles } from './MemosCarousel.styles';
 // import Icon from 'react-native-vector-icons/MaterialIcons';
 import BouncingDots from './BouncingDots';
+import { WebView } from 'react-native-webview';
+import DropCapWebView from '../memos-carousel/DropCapWebView';
 
 interface MemosCarouselProps {
   markers: MapMarker[];
@@ -26,8 +28,7 @@ interface MemosCarouselProps {
 }
 const windowWidth = Dimensions.get('window').width;
 const MemosCarousel = (props: MemosCarouselProps) => {
-  // const {getAddressShort} = useUserContext();
-  const {markers, setCurrentIndex, currentIndex, carouselRef, isRecording} =
+  const { markers, setCurrentIndex, currentIndex, carouselRef, isRecording } =
     props;
   const [selectedMemo, setSelectedMemo] = useState(0);
 
@@ -36,11 +37,6 @@ const MemosCarousel = (props: MemosCarouselProps) => {
     //   setSelectedMemo(currentIndex);
     // }
   }, [currentIndex, carouselRef, selectedMemo, isRecording]);
-
-  // Share Action start
-  // const shareAction = async () => {
-  //   console.log('shareAction');
-  // };
 
   return (
     <View style={styles.containerActionBottom}>
@@ -57,38 +53,25 @@ const MemosCarousel = (props: MemosCarouselProps) => {
           setCurrentIndex(index);
           setSelectedMemo(index);
         }}
-        renderItem={({item, index}) => (
+        renderItem={({ item, index }) => (
           <View style={styles.carouselItemContainer}>
             <View style={styles.contentAction}>
               <View style={styles.transcriptionContainer}>
                 {item.memoTranscription ? (
-                  <View style={styles.containerDrop}>
+
+
+                  <View style={styles.container}>
                     {isRecording ? (
                       <BouncingDots />
                     ) : (
-                      <>
-                        <Text style={styles.firstLetter}>
-                          {item.memoTranscription.charAt(0).toUpperCase()}
-                        </Text>
-                        <View
-                          style={{
-                            flex: 1,
-                            flexDirection: 'row',
-                            flexWrap: 'wrap',
-                          }}>
-                          {/* Conditionally render the rest of the text only if not recording */}
-                          <Text style={styles.initialText}>
-                            {item.memoTranscription.slice(1)}{' '}
-                            {/* Adjust this substring length as needed */}
-                          </Text>
-                        </View>
-                      </>
+                      <DropCapWebView text={item.memoTranscription} />
                     )}
                   </View>
                 ) : (
                   <Text selectable={true} style={styles.transcriptionText}>
-                  No memo transcription available
+                    No memo transcription available.
                   </Text>
+
                 )}
               </View>
               {/* New container for the address and share button */}
@@ -100,7 +83,7 @@ const MemosCarousel = (props: MemosCarouselProps) => {
 
                 <Text style={styles.textActionAddress}>
                   #{index === 0 ? 1 : index}{' '}
-                  <Text style={{textDecorationLine: 'underline'}}>0/babe</Text>
+                  <Text style={{ textDecorationLine: 'underline' }}>0/babe</Text>
                   {item.address
                     ? ' @ ' + item.address.toLowerCase() + ' (2s)'
                     : ' No address available'}
